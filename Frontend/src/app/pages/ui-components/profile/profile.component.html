@@ -1,0 +1,78 @@
+<mat-card class="cardWithShadow theme-card">
+  <mat-card-header>
+    <mat-card-title>
+      Edit Profile
+    </mat-card-title>
+    <mat-card-subtitle class="mat-body-1">
+      This is test page
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-card class="mat-mdc-card mdc-card b-1 shadow-none">
+      <mat-card-content>
+        <div class="row">
+          <!-- Image -->
+          <div class="col-sm-6">
+            <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+              <mat-card-content class="mat-mdc-card-content p-y-24">
+                <mat-card-title class="mat-mdc-card-title">Change Profile</mat-card-title>
+                <mat-card-subtitle class="mat-mdc-card-subtitle mat-body-1">
+                  Change your profile picture from here
+                </mat-card-subtitle>
+                <div class="text-center m-t-24">
+                  <img [src]="profileImage" width="120" class="rounded-circle" alt="Profile Image" />
+                  <div class="m-t-24">
+                    <input type="file" (change)="onFileChange($event)" id="fileInput" hidden />
+                    <button mat-raised-button color="primary" class="m-r-8" (click)="triggerFileInput()">
+                      Upload
+                    </button>
+                    <button mat-raised-button color="warn" (click)="resetImage()">
+                      Reset
+                    </button>
+                  </div>
+                </div>                  
+              </mat-card-content>
+            </mat-card>
+
+
+          </div>
+          <!-- Form -->
+          <div class="col-sm-6">
+            <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+              <mat-card-content class="mat-mdc-card-content p-y-24">
+                <form [formGroup]="form" class="m-t-30">
+                  <mat-form-field appearance="outline" class="w-100" color="primary">
+                    <mat-label>User Name</mat-label>
+                    <input matInput formControlName="uname" />
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="w-100" color="primary">
+                    <mat-label>Email Address</mat-label>
+                    <input matInput formControlName="email" type="email" />
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="w-100" color="primary">
+                    <mat-label>Confirm Password</mat-label>
+                    <input matInput formControlName="password" type="password" />
+                    
+                  </mat-form-field>
+                </form>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+        </mat-card-content>
+    </mat-card>
+  </mat-card-content>
+  <mat-card-actions>
+    <div class="d-flex align-items-center m-b-16">
+      <button  mat-raised-button color="warn" mat-ripple-loader-class-name="mat-mdc-button-ripple" class="mdc-button mdc-button--outlined mat-mdc-outlined-button mat-warn mat-mdc-button-base" (click)="cancel()">Cancel</button>
+      <button 
+        mat-raised-button 
+        class="m-l-8 mdc-button mdc-button--outlined mat-mdc-outlined-button mat-mdc-button-base" 
+        mat-ripple-loader-class-name="mat-mdc-button-ripple"  
+        color="primary" 
+        [disabled]="form.invalid || !form.value.password" (click)="submit()">
+        Save
+      </button>
+    </div>
+  </mat-card-actions>
+</mat-card>

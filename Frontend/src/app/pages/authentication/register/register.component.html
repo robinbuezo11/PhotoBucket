@@ -1,0 +1,80 @@
+<div class="blank-layout-container justify-content-center align-items-center bg-light-primary">
+  <div class="position-relative row w-100 h-100 bg-gredient justify-content-center">
+    <div class="col-lg-6 d-flex align-items-center">
+      <mat-card class="cardWithShadow boxed-auth">
+        <mat-card-content class="p-32">
+          <div class="text-center">
+            <img src="./assets/images/logos/PhotoBucketv2.png" class="align-middle m-2" alt="logo" />
+          </div>
+
+          <div class="or-border m-t-130">Sign Up</div>
+          <div class="row">
+            <!-- Image -->
+            <div class="col-sm-6">
+              <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+                <mat-card-content class="mat-mdc-card-content p-y-24">
+                  <mat-card-title class="mat-mdc-card-title">Create Profile</mat-card-title>
+                  <mat-card-subtitle class="mat-mdc-card-subtitle mat-body-1">
+                    Post a profile image
+                  </mat-card-subtitle>
+                  <div class="text-center m-t-24">
+                    <img [src]="profileImage" width="120" class="rounded-circle" alt="Profile Image" />
+                    <div class="m-t-24">
+                      <input type="file" (change)="onFileChange($event)" id="fileInput" hidden />
+                      <button mat-flat-button color="primary" class="m-r-8" (click)="triggerFileInput()">
+                        Upload
+                      </button>
+                      <button mat-stroked-button color="warn" (click)="resetImage()">
+                        Reset
+                      </button>
+                    </div>
+                  </div>                  
+                </mat-card-content>
+              </mat-card>
+            </div>
+            <!-- Form -->
+            <div class="col-sm-6">
+              <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+                <mat-card-content class="mat-mdc-card-content p-y-24">
+                  <form [formGroup]="form" (ngSubmit)="submit()" class="m-t-30">
+                    <mat-form-field appearance="outline" class="w-100" color="primary">
+                      <mat-label>User Name</mat-label>
+                      <input matInput formControlName="uname" />
+                      
+                      
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="w-100" color="primary">
+                      <mat-label>Email Address</mat-label>
+                      <input matInput formControlName="email" type="email" />
+                      
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="w-100" color="primary">
+                      <mat-label>Password</mat-label>
+                      <input matInput formControlName="password" type="password" />
+                     
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="w-100" color="primary">
+                      <mat-label>Confirm Password</mat-label>
+                      <input matInput formControlName="confirmPassword" type="password" />
+                      
+                    </mat-form-field>
+
+                    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid" class="w-100">
+                      Sign Up
+                    </button>
+                  </form>
+                  <span class="d-block f-w-500 text-center m-t-24"> Already have an Account?
+                    <a [routerLink]="['/authentication/login']" class="text-decoration-none text-primary f-w-500 f-s-14"> Sign In</a>
+                  </span>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>  
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

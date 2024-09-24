@@ -1,0 +1,45 @@
+const AWS = require('aws-sdk');
+require('dotenv').config();
+
+const rekognition = new AWS.Rekognition({
+    accessKeyId: process.env.REKOGNITION_ACCESS_KEY_ID,
+    secretAccessKey: process.env.REKOGNITION_SECRET_ACCESS_KEY,
+    region: process.env.REKOGNITION_REGION,
+});
+
+async function analyzeImage(base64Image) {
+    try {
+        const buffer = Buffer.from(base64Image, 'base64');
+
+        const response = await rekognition.detectLabels({
+            Image: {
+                Bytes: buffer
+            },
+            MaxLabels: 5
+        }).promise();
+
+        return response.Labels.map(tag => tag.Name);
+    } catch (error) {
+        console.error(error);
+        throw new Error('Ocurrió un error al procesar la imagen.');
+    }
+}
+
+async function extractText(base64Image) {
+    try {
+        const buffer = Buffer.from(base64Image, 'base64');
+
+        const response = await rekognition.detectText({
+            Image: {
+                Bytes: buffer
+            }
+        }).promise();
+
+        return response.TextDetections.map(detection => detection.DetectedText);
+    } catch (error) {
+        console.error(error);
+        throw new Error('Ocurrió un error al procesar la imagen.');
+    }
+}
+
+module.exports = {analyzeImage,extractText};

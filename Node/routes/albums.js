@@ -1,0 +1,86 @@
+const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const { Upload } = require("@aws-sdk/lib-storage");
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
+const express = require('express');
+const router = express.Router();
+const db = require('../utils/db');
+
+// Configure AWS
+const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    }
+});
+
+// Get all albums
+router.get('/', async (req, res) => {
+    try {
+        const [rows] = await db.query('SELECT * FROM ALBUM;');
+        const albums = rows.map (album => {
+            return {
+                id:             album.ID,
+                nombre:         album.NOMBRE,
+                usuario:        album.USUARIO,
+                creacion:       album.CREACION
+            }
+        });
+        res.json(albums);
+    } catch (error) {
+        res.status(500).json({ error: error.message, message: 'Error al obtener las imagenes' });
+    }
+    console.log('GET /imagenes');
+});
+
+// Create album
+router.post('/crear', async (req, res) => {
+    try {
+        const { usuario } = req.body;
+        let [rows] = await db.query('SELECT COUNT(*) AS count FROM ALBUM WHERE USUARIO = ?;', [usuario]);
+        const nombre = "Mi album n°" + (rows[0].count + 1);
+
+        // Insertar album en la base de datos
+        const [result] = await db.query('INSERT INTO ALBUM (NOMBRE, USUARIO)  VALUES (?, ?);', [nombre, usuario]);
+        res.json({ message: 'Álbum creado', id: result.ID, nombre: nombre, usuario: usuario });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message, message: 'Error al crear el álbum' });
+    }
+    console.log('POST /album/crear');
+});
+
+
+// Update album
+router.post('/actualizar', async (req, res) => {
+    try {
+        const { usuario, album,  nombre} = req.body;
+
+        // Insertar album en la base de datos
+        const [result] = await db.query('UPDATE ALBUM SET NOMBRE = ? WHERE USUARIO = ? AND ID = ?;', [nombre, usuario, album]);
+        res.json({ message: 'Álbum actualizado' });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message, message: 'Error al actualizar el álbum' });
+    }
+    console.log('POST /album/actualizar');
+});
+
+// Delete album
+router.post('/eliminar', async (req, res) => {
+    try {
+        const { usuario, album } = req.body;
+
+        // Borrar album de la base de datos
+        const [result] = await db.query('DELETE FROM ALBUM WHERE USUARIO = ? AND ID = ?;', [usuario, album]);
+        res.json({ message: 'Álbum eliminado' });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message, message: 'Error al eliminar el álbum' });
+    }
+    console.log('POST /album/eliminar');
+});
+
+module.exports = router;
