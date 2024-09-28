@@ -2,66 +2,95 @@
   <mat-card-content class="mat-mdc-card-content p-24">
     <div class="row justify-content-between gap-16">
       <div class="col-lg-4">
-        
+
       </div>
       <div class="col-lg-4 d-flex align-items-center justify-content-end">
-        <button mat-flat-button color="primary" mat-ripple-loader-class-name="mat-mdc-button-ripple" 
-          class="mdc-button mdc-button--unelevated mat-mdc-unelevated-button mat-primary mat-mdc-button-base"
-        >
+        <button  mat-raised-button color="primary" mat-ripple-loader-class-name="mat-mdc-button-ripple"
+                class="mdc-button mdc-button--unelevated mat-mdc-unelevated-button mat-primary mat-mdc-button-base" (click)="showOverlay2()">
             Add Album
+        </button>
+        <button mat-raised-button  color="warn" mat-ripple-loader-class-name="mat-mdc-button-ripple"
+                class="m-l-8 mdc-button mdc-button--outlined mat-mdc-outlined-button mat-warn mat-mdc-button-base" (click)="showOverlay()">
+          Add Image
         </button>
       </div>
     </div>
   </mat-card-content>
 </mat-card>
+<!--div class="col-sm-12 col-lg-12">
+   <mat-card>
+     <p>Albunes</p>
+     <button mat-fab class="prev" matTooltip="Previous" (click)="prevImage()">
+       <mat-icon>navigate_before</mat-icon>
+     </button>
+     <button mat-fab class="next" matTooltip="Next" (click)="nextImage()">
+       <mat-icon>navigate_next</mat-icon>
+     </button>
+     <img mat-card-image class="image-container slide-image" style="height: 88vh" src="/assets/images/products/p1.jpg">
+   </mat-card>
+ </div-->
 
 <div class="row">
-  <div class="col-sm-6 col-lg-3" *ngFor="let productcard of productcards">
-    <mat-card class="cardWithShadow productcard overflow-hidden">
-      <a routerLink="/widgets/cards">
-        <img
-          src="{{ productcard.imgSrc }}"
-          alt="imgSrc"
-          class="w-100"
-          mat-card-image
-        />
-      </a>
+  <div class="col-sm-6 col-lg-3" *ngFor="let imagen of imagenes">
+    <mat-card class="mat-mdc-card mdc-card cardWithShadow card2 position-relative card-hover cursor-pointer" (click)="goToDetails(imagen.id)">
+      <img
+        src="{{ imagen.imagen }}"
+        alt="imgSrc"
+        class="w-100 mat-mdc-card-image"
+        mat-card-image
+        style="width: 100%;height: 250px;"
+      />
       <mat-card-content class="p-b-24 p-t-12 position-relative">
         <button
           mat-mini-fab
           color="primary"
           class="icon-30 cart-btn"
           matTooltip="Add to Cart"
+          (click)="$event.stopPropagation()"
         >
           <i-tabler name="basket" class="icon-16"></i-tabler>
         </button>
-        <mat-card-title class="mat-headline-2 f-s-16 m-b-4">{{
-          productcard.title
-        }}</mat-card-title>
+        <mat-card-title class="mat-headline-2 f-s-16 m-b-4">
+          {{ imagen.nombre }}
+        </mat-card-title>
         <div class="d-flex align-items-center justify-content-between">
           <div class="d-flex align-items-center">
-            <h6 class="mat-body-2 f-w-600">${{ productcard.price }}</h6>
-            <span class="f-s-14 m-l-4 text-decoration-line-through"
-              >${{ productcard.rprice }}</span
-            >
+            <h6 class="mat-body-2 f-w-600">{{ imagen.album }}</h6>
           </div>
-          <div class="m-l-auto d-flex gap-4">
-            <span
-              ><i-tabler name="star" class="fill-warning icon-18"></i-tabler
-            ></span>
-            <span
-              ><i-tabler name="star" class="fill-warning icon-18"></i-tabler
-            ></span>
-            <span
-              ><i-tabler name="star" class="fill-warning icon-18"></i-tabler
-            ></span>
-            <span
-              ><i-tabler name="star" class="fill-warning icon-18"></i-tabler
-            ></span>
-            <span
-              ><i-tabler name="star" class="fill-warning icon-18"></i-tabler
-            ></span>
+        </div>
+        <div _ngcontent-ng-c3419400236="" class="d-flex align-items-center justify-content-center m-t-24">
+          <div _ngcontent-ng-c3419400236="" class="d-flex align-items-center">
+            <span _ngcontent-ng-c3419400236="" class="m-r-12 f-s-14 mat-subtitle-2 d-flex align-items-center">
+              <i-tabler _ngcontent-ng-c3419400236="" name="eye" class="icon-18 m-r-4" _nghost-ng-c2605515766="">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                  <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                </svg>
+              </i-tabler>
+              9,125
+            </span>
+            <span _ngcontent-ng-c3419400236="" class="f-s-14 mat-subtitle-2 d-flex align-items-center">
+              <i-tabler _ngcontent-ng-c3419400236="" name="message-2" class="icon-18 m-r-4" _nghost-ng-c2605515766="">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M8 9h8"></path>
+                  <path d="M8 13h6"></path>
+                  <path d="M9 18h-3a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-3l-3 3l-3 -3z"></path>
+                </svg>
+              </i-tabler>
+              3
+            </span>
           </div>
+          <span _ngcontent-ng-c3419400236="" class="m-l-auto f-s-14 mat-subtitle-2 d-flex align-items-center">
+            <i-tabler _ngcontent-ng-c3419400236="" name="point" class="icon-14 m-r-4" _nghost-ng-c2605515766="">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
+              </svg>
+            </i-tabler>
+            {{ imagen.creacion | date:'EEE, MMM d' }}
+          </span>
         </div>
       </mat-card-content>
     </mat-card>

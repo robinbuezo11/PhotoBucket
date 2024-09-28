@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../../material.module';
 import { MatDialogModule } from '@angular/material/dialog'; // Importar MatDialogModule
@@ -15,6 +15,8 @@ import { ExtraRoutes } from './extra.routing';
 import { AppIconsComponent } from './icons/icons.component';
 import { AppSamplePageComponent } from './sample-page/sample-page.component';
 import { DialogComponentComponent } from './dialog-component/dialog-component.component';
+import { ImageComponent} from "./image/image.component";
+import { NewAlbumComponent} from "./new-album/new-album.component";
 
 @NgModule({
   imports: [
@@ -27,11 +29,14 @@ import { DialogComponentComponent } from './dialog-component/dialog-component.co
     MatFormFieldModule,
     MatInputModule,
     TablerIconsModule.pick(TablerIcons),
+    NgOptimizedImage,
   ],
   declarations: [
     AppIconsComponent,
     AppSamplePageComponent,
     DialogComponentComponent,
+    ImageComponent,
+    NewAlbumComponent
   ],
 })
 export class ExtraModule {}

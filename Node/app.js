@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-const host = '0.0.0.0';
+const host = '127.0.0.1';
 const port = 3001;
 
 const indexRouter = require('./routes/index');

@@ -1,5 +1,7 @@
 const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const { Upload } = require("@aws-sdk/lib-storage");
+const axios = require('axios');
+const imageProccesor = require('../utils/analyze.image');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
@@ -36,6 +38,86 @@ router.get('/', async (req, res) => {
     }
     console.log('GET /imagenes');
 });
+
+router.get('/:usuarioId', async (req, res) => {
+    const { usuarioId } = req.params;  // Obtén el ID del usuario de los parámetros
+
+    try {
+        const [rows] = await db.query(
+            `SELECT img.ID, img.NOMBRE, img.DESCRIPCION, img.IMAGEN, img.ALBUM, img.CREACION 
+             FROM IMAGEN img
+             JOIN ALBUM alb ON img.ALBUM = alb.ID
+             WHERE alb.USUARIO = ?`, 
+            [usuarioId]  // Pasar el ID del usuario como parámetro
+        );
+
+        const imgs = rows.map(img => {
+            return {
+                id: img.ID,
+                nombre: img.NOMBRE,
+                descripcion: img.DESCRIPCION,
+                imagen: img.IMAGEN,
+                album: img.ALBUM,
+                creacion: img.CREACION
+            };
+        });
+        
+        res.json(imgs);
+    } catch (error) {
+        res.status(500).json({ error: error.message, message: 'Error al obtener las imágenes' });
+    }
+    
+    console.log('GET /imagenes');
+});
+
+router.get('/image/:imageId', async (req, res) => {
+    const { imageId } = req.params;
+    try {
+        const [imageRows] = await db.query(
+            `SELECT ID, NOMBRE, DESCRIPCION, IMAGEN, ALBUM, CREACION 
+             FROM IMAGEN 
+             WHERE ID = ?`, 
+            [imageId]
+        );
+
+        if (imageRows.length === 0) {
+            return res.status(404).json({ message: 'Imagen no encontrada' });
+        }
+
+        const albumId = imageRows[0].ALBUM;
+
+        const [albumRows] = await db.query(
+            `SELECT NOMBRE FROM ALBUM WHERE ID = ?`, 
+            [albumId]
+        );
+
+        if (albumRows.length === 0) {
+            return res.status(404).json({ message: 'Álbum no encontrado' });
+        }
+
+        const imageUrl = imageRows[0].IMAGEN;
+        const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+        const base64Image = Buffer.from(response.data, 'binary').toString('base64');
+        const labels = await imageProccesor.analyzeImage(base64Image);
+
+        const img = {
+            id: imageRows[0].ID,
+            nombre: imageRows[0].NOMBRE,
+            descripcion: imageRows[0].DESCRIPCION,
+            imagen: imageRows[0].IMAGEN,
+            album: albumRows[0].NOMBRE,
+            creacion: imageRows[0].CREACION,
+            labels
+        };
+
+        res.json(img);
+
+    } catch (error) {
+        res.status(500).json({ error: error.message, message: 'Error al obtener la imagen' });
+    }
+    console.log(`GET /imagenes/image/${imageId}`);
+});
+
 
 // Subir imagen
 router.post('/subir', async (req, res) => {
@@ -125,5 +207,27 @@ router.delete('/eliminar', async (req, res) => {
     }
     console.log('DELETE /imagenes/eliminar');
 });
+
+
+router.post('/analyzeImage', async (req, res) => {
+    try {
+        const { imagen } = req.body;
+        if (!imagen) {
+            return res.status(400).json({ message: 'Imagen no proporcionada' });
+        }
+        const imageBuffer = Buffer.from(imagen.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+        if (!imageBuffer) {
+            return res.status(400).json({ message: 'Error al procesar la imagen' });
+        }
+        const labels = await imageProccesor.extractText(imageBuffer);
+        res.json({ labels });
+    } catch (err) {
+        console.error('Error al analizar la imagen:', err);
+        res.status(500).json({ error: err.message, message: 'Error en el servidor' });
+    }
+    console.log('POST /analyzeImage');
+});
+
+
 
 module.exports = router;

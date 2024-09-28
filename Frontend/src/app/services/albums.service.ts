@@ -19,7 +19,12 @@ export class AlbumsService {
     return this.http.get(this.apiURL + 'listar');
   }
 
+  getAlbumsByUser(userId: string): Observable<any> {
+    return this.http.get(this.apiURL + userId);
+  }
+
   createAlbum(album: any): Observable<any> {
+    console.log('album', album);
     return this.http.post(this.apiURL + 'crear', album);
   }
 

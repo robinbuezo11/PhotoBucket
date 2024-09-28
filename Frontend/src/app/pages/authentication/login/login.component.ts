@@ -10,16 +10,24 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class AppSideLoginComponent {
   form: FormGroup;
+  error: string = '';
 
   constructor(
     private router: Router,
     private usersService: UsersService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {
     this.form = new FormGroup({
       usuario: new FormControl('', [Validators.required]),
       password: new FormControl('', [Validators.required]),
     });
+  }
+
+  ngOnInit() {
+    const user = JSON.parse(sessionStorage.getItem('userData') || '{}');
+    if (user && user.token) {
+      this.router.navigate(['/dashboard']);
+    }
   }
 
   get f() {
@@ -35,12 +43,12 @@ export class AppSideLoginComponent {
     }
 
     const { usuario, password } = this.form.value;
-    
+
     this.usersService.login({ usuario, password }).subscribe(
       (response: any) => {
         localStorage.setItem('user', JSON.stringify(response.user));
         this.router.navigate(['/dashboard']);
-        this.snackBar.open('Inicio de sesión exitoso', 'Cerrar', 
+        this.snackBar.open('Inicio de sesión exitoso', 'Cerrar',
           { duration: 2000 }
         );
       },

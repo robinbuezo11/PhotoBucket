@@ -1,0 +1,16 @@
+<h2 mat-dialog-title class="mat-mdc-dialog-title mdc-dialog__title m-b-24">Create new album </h2>
+<mat-dialog-content class="mat-mdc-dialog-content mdc-dialog__content mat-typography" style="max-width: 600px;">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">
+      Name of the album
+    </mat-label>
+    <mat-form-field appearance="outline" class="w-100" color="primary">
+      <input matInput formControlName="albumName" />
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-divider role="separator" class="mat-divider mat-divider-horizontal" aria-orientation="horizontal"></mat-divider>
+<mat-dialog-actions class="mat-mdc-dialog-actions mdc-dialog__actions p-24">
+  <button mat-raised-button color="primary"  mat-dialog-close> Cancel </button>
+  <button mat-raised-button color="accent" (click)="onSubmit()" cdkFocusInitial>Save</button>
+</mat-dialog-actions>

@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { AuthService} from "./auth.service";
 
 // icons
 import { TablerIconsModule } from 'angular-tabler-icons';
@@ -47,6 +48,7 @@ import { AppNavItemComponent } from './layouts/full/sidebar/nav-item/nav-item.co
     NgScrollbarModule,
   ],
   exports: [TablerIconsModule],
+  providers: [AuthService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

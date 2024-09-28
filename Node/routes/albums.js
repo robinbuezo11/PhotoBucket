@@ -35,22 +35,42 @@ router.get('/', async (req, res) => {
     console.log('GET /imagenes');
 });
 
+router.get('/:userId', async (req, res) => {
+    const userId = req.params.userId; // Obtener el ID del usuario desde los parámetros de la ruta
+    try {
+        const [rows] = await db.query('SELECT * FROM ALBUM WHERE USUARIO = ?;', [userId]); // Filtrar por usuario
+        const albums = rows.map(album => {
+            return {
+                id: album.ID,
+                nombre: album.NOMBRE,
+                usuario: album.USUARIO,
+                creacion: album.CREACION
+            };
+        });
+        res.json(albums);
+    } catch (error) {
+        res.status(500).json({ error: error.message, message: 'Error al obtener los álbumes' });
+    }
+    console.log(`GET /albums/${userId}`);
+});
+
+
 // Create album
 router.post('/crear', async (req, res) => {
     try {
-        const { usuario } = req.body;
-        let [rows] = await db.query('SELECT COUNT(*) AS count FROM ALBUM WHERE USUARIO = ?;', [usuario]);
-        const nombre = "Mi album n°" + (rows[0].count + 1);
-
-        // Insertar album en la base de datos
-        const [result] = await db.query('INSERT INTO ALBUM (NOMBRE, USUARIO)  VALUES (?, ?);', [nombre, usuario]);
-        res.json({ message: 'Álbum creado', id: result.ID, nombre: nombre, usuario: usuario });
-    }
-    catch (error) {
+        const { usuario, nombreAlbum } = req.body;
+        let [rows] = await db.query('SELECT COUNT(*) AS count FROM ALBUM WHERE USUARIO = ? AND NOMBRE = ?;', [usuario, nombreAlbum]);
+        if (rows[0].count > 0) {
+            return res.status(400).json({ message: 'El nombre del álbum ya está en uso.' });
+        }
+        const [result] = await db.query('INSERT INTO ALBUM (NOMBRE, USUARIO) VALUES (?, ?);', [nombreAlbum, usuario]);
+        res.json({ message: 'Álbum creado', id: result.insertId, nombre: nombreAlbum, usuario: usuario });
+    } catch (error) {
         res.status(500).json({ error: error.message, message: 'Error al crear el álbum' });
     }
     console.log('POST /album/crear');
 });
+
 
 
 // Update album

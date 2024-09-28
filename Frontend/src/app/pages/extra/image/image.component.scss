@@ -1,0 +1,40 @@
+section {
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.create__post {
+  background-color: var(--dark-light-color);
+  min-width: 535px;
+  min-height: 430px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+}
+
+h3 {
+  flex: 0.5;
+}
+
+.center {
+  flex: 1;
+}
+
+span {
+  background-color: #0095f6;
+  transition: 0.3s;
+}
+
+span:hover {
+  background-color: #0b7bc5;
+}
+
+.emoji-mart {
+  right: -100px;
+  bottom: 50px;
+}
+
+@media screen and (max-width: 768px) {
+  .create__post {
+    width: 80%;
+  }
+}
+

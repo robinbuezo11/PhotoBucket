@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 export class UsersService {
 
   private apiURL = 'http://127.0.0.1:3001/usuarios/';
-  
+
   // BehaviorSubject para manejar el estado del usuario
   private userDataSubject = new BehaviorSubject<any>(JSON.parse(sessionStorage.getItem('userData') || '{}'));
   userData$ = this.userDataSubject.asObservable();
@@ -42,10 +42,7 @@ export class UsersService {
   updateUser(user: any): Observable<any> {
     return this.http.put(this.apiURL + 'actualizar', user).pipe(
       tap((response: any) => {
-        // Actualizar sessionStorage con la nueva información del usuario
         sessionStorage.setItem('userData', JSON.stringify(response));
-        
-        // Emitir el nuevo valor a través del BehaviorSubject
         this.userDataSubject.next(response);
       })
     );

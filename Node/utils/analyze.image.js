@@ -15,7 +15,7 @@ async function analyzeImage(base64Image) {
             Image: {
                 Bytes: buffer
             },
-            MaxLabels: 5
+            MaxLabels: 10
         }).promise();
 
         return response.Labels.map(tag => tag.Name);
@@ -28,13 +28,12 @@ async function analyzeImage(base64Image) {
 async function extractText(base64Image) {
     try {
         const buffer = Buffer.from(base64Image, 'base64');
-
         const response = await rekognition.detectText({
             Image: {
                 Bytes: buffer
             }
         }).promise();
-
+        console.log(response);
         return response.TextDetections.map(detection => detection.DetectedText);
     } catch (error) {
         console.error(error);
