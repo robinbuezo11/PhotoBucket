@@ -292,4 +292,10 @@ router.delete('/eliminar/', async (req, res) => {
     console.log('DELETE /usuarios/eliminar');
 });
 
+router.get('/logingCamera', async (req, res) => {
+    const currentPicture = await this.obtenerFotoPerfilUsuario(correo);
+    const url = await uploader.uploadImage(picture, 'login');
+    return await compareImages(currentPicture[0].url, url)
+});
+
 module.exports = router;

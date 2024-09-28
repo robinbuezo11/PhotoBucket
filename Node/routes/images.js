@@ -2,6 +2,7 @@ const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const { Upload } = require("@aws-sdk/lib-storage");
 const axios = require('axios');
 const imageProccesor = require('../utils/analyze.image');
+const translateText = require('../utils/translate.text');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
@@ -228,6 +229,19 @@ router.post('/analyzeImage', async (req, res) => {
     console.log('POST /analyzeImage');
 });
 
+router.post('/translateText', async (req, res) => {
+    try{
+        const { text, targetLanguage } = req.body;
+        if (!text || !targetLanguage) {
+            return res.status(400).json({ message: 'Faltan campos obligatorios' });
+        }
+        const translatedText = await translateText(text, targetLanguage);
+        res.json({ translatedText });
+    }catch(err){
+        console.error('Error al traducir el texto:', err);
+        res.status(500).json({ error: err.message, message: 'Error en el servidor' });
+    }
+});
 
 
 module.exports = router;
