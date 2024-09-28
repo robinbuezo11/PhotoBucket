@@ -102,6 +102,73 @@
       </ul>
     </mat-card-content>
   </mat-card>
+
+  <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+    <mat-card-content class="mat-mdc-card-content p-24">
+      <mat-card-title class="mat-mdc-card-title m-b-24 f-s-21">
+        Translated text
+      </mat-card-title>
+
+      <mat-card-content class="mat-mdc-card-content p-24" [formGroup]="form">
+        <div class="row">
+          <div class="col-lg-6">
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <mat-select formControlName="languaje" placeholder="Select languaje">
+                <mat-option *ngFor="let languaje of languajes" [value]="languaje.id">
+                  {{ languaje.nombre }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="form.get('languaje')?.hasError('required') && form.get('languaje')?.touched">
+                Languaje selection is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-lg-6">
+            <button mat-raised-button color="accent" [disabled]="form.get('languaje')?.invalid" (click)="traslateText()">
+              Translate
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-divider role="separator" class="mat-divider m-y-32 mat-divider-horizontal" aria-orientation="horizontal"></mat-divider>
+
+      <div _ngcontent-ng-c3947872107="" class="bg-light rounded p-24 m-t-24" *ngIf="selectedLanguaje">
+        <div _ngcontent-ng-c3947872107="" class="d-flex align-items-center">
+          <img _ngcontent-ng-c3947872107="" src="/assets/images/profile/user-2.jpg" alt="user" width="35" class="rounded-circle">
+          <span _ngcontent-ng-c3947872107="" class="mat-body-2 f-w-600 m-l-12">
+            {{ selectedLanguaje.nombre }}
+          </span>
+          <span class="m-l-12 f-s-12 d-flex align-items-center">
+            <i-tabler name="circle-filled" class="icon-7 op-5 d-flex m-r-4">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M7 3.34a10 10 0 1 1 -4.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 4.995 -8.336z"></path>
+              </svg>
+            </i-tabler>
+            now
+          </span>
+        </div>
+        <p class="mat-body-1 m-t-16">
+          {{ textTranslated }}
+        </p>
+        <button mat-mini-fab="" color="primary" mattooltip="Reply" class="icon-30 m-t-16 mdc-fab mat-mdc-fab-base mdc-fab--mini mat-mdc-mini-fab mat-primary mat-mdc-button-base" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple">
+          <span class="mat-mdc-button-persistent-ripple mdc-fab__ripple"></span>
+          <span class="mdc-button__label">
+            <i-tabler name="arrow-back-up" class="icon-18" _nghost-ng-c2605515766="">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M9 14l-4 -4l4 -4"></path>
+                <path d="M5 10h11a4 4 0 1 1 0 8h-1"></path>
+              </svg>
+            </i-tabler>
+          </span>
+          <span class="mat-mdc-focus-indicator"></span>
+          <span class="mat-mdc-button-touch-target"></span>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>
 
   <div *ngIf="loading" class="spinner-container align-items-lg-center">

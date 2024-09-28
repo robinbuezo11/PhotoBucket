@@ -42,6 +42,10 @@ export class ImagesService {
     return this.http.post<any>(this.apiURL + 'analyzeImage', image);
   }
 
+  translateText(text: string, targetLanguage: string): Observable<any> {
+    return this.http.post<any>(this.apiURL + 'translateText', { text, targetLanguage });
+  }
+
   deleteImage(id: string): Observable<any> {
     return this.http.delete(this.apiURL + 'eliminar/' + id);
   }
