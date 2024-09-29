@@ -16,7 +16,7 @@
             </div>
             <mat-spinner *ngIf="isLoading" diameter="50" class="m-t-10"></mat-spinner>
             <button mat-raised-button color="primary" class="m-t-10" (click)="processImage()" [disabled]="!selectedFile || isLoading">
-              Procesar
+              Process
             </button>
             <mat-error *ngIf="errorMessage" class="m-t-10">{{ errorMessage }}</mat-error>
           </mat-card-content>
@@ -32,7 +32,7 @@
               {{ extractedText }}
             </textarea>
             <button mat-raised-button color="warn" class="m-t-10" (click)="reset()" *ngIf="extractedText || errorMessage">
-              Reiniciar
+              Reboot
             </button>
           </mat-card-content>
         </mat-card>
