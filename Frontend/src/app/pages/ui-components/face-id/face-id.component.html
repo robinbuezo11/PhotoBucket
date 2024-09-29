@@ -43,7 +43,7 @@
             <mat-card-header>
                 <div class="mat-mdc-card-header-text">
                     <mat-card-title>
-                        Configuration
+                        Please look at the Camera
                     </mat-card-title>
                 </div>
             </mat-card-header>
@@ -64,8 +64,10 @@
                             <br/>
                             <mat-list class="mat-mdc-list mat-mdc-list-base mdc-list d-flex" aria-disabled="false">
                                 <mat-list-item class="mat-mdc-list-item mdc-list-item mat-mdc-list-item-single-line mdc-list-item--with-one-line">
-                                    <button class="nav-link active rounded-5" id="home-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="true" (click)="triggerCaptura(); ">Take Photo</button>
-                                </mat-list-item>
+                                    <button mat-flat-button color="accent" class="rounded-5" (click)="triggerCaptura();">
+                                      Take Photo
+                                    </button>
+                                  </mat-list-item>
                                 <mat-divider role="separator" class="mat-divider mat-divider-vertical" aria-orientation="vertical"></mat-divider>      
                                 <mat-list-item class="mat-mdc-list-item mdc-list-item mat-mdc-list-item-single-line mdc-list-item--with-one-line">
                                     <button class="nav-link rounded-5" id="profile-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" (click)="toggleWebcam();">Hide Camera</button>
