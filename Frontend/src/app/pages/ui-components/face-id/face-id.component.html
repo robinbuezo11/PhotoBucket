@@ -1,130 +1,133 @@
 <mat-card class="cardWithShadow theme-card">
-    <mat-card-header>
-        <mat-card-title>
-            Face ID Configuration
-        </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-        <mat-card class="mat-mdc-card mdc-card b-1 shadow-none">
-            <mat-card-header>
-                <div class="mat-mdc-card-header-text">
-                    <mat-card-title>
-                        Configuration
-                    </mat-card-title>
-                </div>
-            </mat-card-header>
-            <mat-card-content>
-                <div class="p-24 rounded bg-light-primary m-t-16">
-                    <mat-slide-toggle 
-                        class="mat-mdc-slide-toggle mat-accent" 
-                        (change)="onToggleChange($event)">
-                        <div class="mdc-form-field mat-internal-form-field">
-                            <button 
-                                role="switch" 
-                                type="button" 
-                                class="mdc-switch" 
-                                tabindex="0" 
-                                aria-checked="false"> 
-                            </button>
-                            <label 
-                                class="mdc-label"
-                                for="mat-mdc-slide-toggle-14-button">
-                                Using facial recognition to authenticate?
-                            </label>
-                        </div>
-                    </mat-slide-toggle>
-                </div>
-            </mat-card-content>
-        </mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      Face ID Configuration
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-card class="mat-mdc-card mdc-card b-1 shadow-none">
+      <mat-card-header>
+        <div class="mat-mdc-card-header-text">
+          <mat-card-title>
+            Configuration
+          </mat-card-title>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="p-24 rounded bg-light-primary m-t-16">
+          <mat-slide-toggle
+            class="mat-mdc-slide-toggle mat-accent"
+            [checked]="isSwitchOn"
+            (change)="onToggleChange($event)">
+            <div class="mdc-form-field mat-internal-form-field">
+              <button
+                role="switch"
+                type="button"
+                class="mdc-switch"
+                tabindex="0"
+                aria-checked="false">
+              </button>
+              <label
+                class="mdc-label"
+                for="mat-mdc-slide-toggle-14-button">
+                Using facial recognition to authenticate?
+              </label>
+            </div>
+          </mat-slide-toggle>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
-        <mat-card 
-            class="mat-mdc-card mdc-card b-1 shadow-none"
-            *ngIf="isSwitchOn">
-            <mat-card-header>
-                <div class="mat-mdc-card-header-text">
-                    <mat-card-title>
-                        Please look at the Camera
-                    </mat-card-title>
-                </div>
-            </mat-card-header>
-            <mat-card-content>
-                <!-- Additional content here -->
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class ="card">
-                            <h5 class="resaldato2">Camera <i class="bi bi-camera"></i></h5>
-                            <hr class="border border-primary border-3 opacity-75">
-                            <webcam [height]="500" [width]="500" [trigger]="triggerObservable" (imageCapture)="handleImage($event)" *ngIf="mostrarWebcam"
-                                      [switchCamera]="nextWebcamObservable"
-                                      [imageQuality]="1"
-                                      (cameraSwitched)="cameraSwitched($event)"
-                                      (initError)="handleInitError($event)"
-                            ></webcam>
-                            <hr class="border border-danger border-2 opacity-50">
-                            <br/>
-                            <mat-list class="mat-mdc-list mat-mdc-list-base mdc-list d-flex" aria-disabled="false">
-                                <mat-list-item class="mat-mdc-list-item mdc-list-item mat-mdc-list-item-single-line mdc-list-item--with-one-line">
-                                    <button mat-flat-button color="accent" class="rounded-5" (click)="triggerCaptura();">
-                                      Take Photo
-                                    </button>
-                                  </mat-list-item>
-                                <mat-divider role="separator" class="mat-divider mat-divider-vertical" aria-orientation="vertical"></mat-divider>      
-                                <mat-list-item class="mat-mdc-list-item mdc-list-item mat-mdc-list-item-single-line mdc-list-item--with-one-line">
-                                    <button class="nav-link rounded-5" id="profile-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" (click)="toggleWebcam();">Hide Camera</button>
-                                </mat-list-item>
-                                <mat-divider role="separator" class="mat-divider mat-divider-vertical" aria-orientation="vertical"></mat-divider>   
-                                <mat-list-item class="mat-mdc-list-item mdc-list-item mat-mdc-list-item-single-line mdc-list-item--with-one-line">
-                                    <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" (click)="showNextWebcam(dispositivoId);">Activate Camera</button>
-                                </mat-list-item>
-                            </mat-list>
-                        </div>
-                    </div>
-                    <mat-divider 
-                        class="mat-divider mat-divider-vertical"
-                        role="separator" 
-                        aria-orientation="vertical">
-                    </mat-divider>
-                    <div class="col-lg-5">
-                        <div class ="card">
-                            <h5 class="resaltado">
-                                In order to use the face ID, confirm this information <i class="bi bi-camera"></i></h5>
-                            <hr class="border border-primary border-3 opacity-75">
-                            <form [formGroup]="form" (ngSubmit)="saveFaceId()" class="m-t-30">
-                                <button mat-flat-button color="accent" class="w-100">
-                                    Modify key photo
-                                </button>
-                                <hr class="border border-primary border-3 opacity-75">
+    <mat-card class="mat-mdc-card mdc-card b-1 shadow-none" *ngIf="isSwitchOn">
+      <mat-card-header>
+        <div class="mat-mdc-card-header-text">
+          <mat-card-title>
+            Please look at the Camera
+          </mat-card-title>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Additional content here -->
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="card">
+              <h5 class="resaldato2">Camera <i class="bi bi-camera"></i></h5>
+              <hr class="border border-primary border-3 opacity-75">
 
-                                <div class="d-flex align-items-center m-b-16">
-                                    <img width="50" class="rounded-circle" src="assets/images/profile/user-1.jpg">
-                                    <button mat-flat-button="" color="primary" class="m-l-16 input-file-button mdc-button mdc-button--unelevated mat-mdc-unelevated-button mat-primary mat-mdc-button-base" mat-ripple-loader-class-name="mat-mdc-button-ripple">
-                                        <span class="mat-mdc-button-persistent-ripple mdc-button__ripple"></span>
-                                        <span class="mdc-button__label"><input type="file"></span>
-                                        <span class="mat-mdc-focus-indicator"></span>
-                                        <span class="mat-mdc-button-touch-target"></span>
-                                        <span class="mat-ripple mat-mdc-button-ripple"></span>
-                                    </button>
-                                </div>
-                                <hr class="border border-primary border-3 opacity-75">
-                                <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">
-                                    Password
-                                </mat-label>
-                                <mat-form-field appearance="outline" class="w-100" color="primary">
-                                    <input matInput type="password" formControlName="password" />
-                                </mat-form-field>
-                                <hr class="border border-primary border-3 opacity-75">
-                                <button mat-flat-button color="primary" class="w-100" [disabled]="form.invalid"> 
-                                    Save changes
-                                </button>
-                                <hr class="border border-primary border-3 opacity-75">
-                                <button mat-flat-button color="warn" class="w-100">
-                                    Cancel
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+              <img *ngIf="recimagen && !mostrarWebcam" [src]="recimagen" alt="Captured Face ID" width="500">
+
+              <webcam
+                *ngIf="mostrarWebcam"
+                [height]="500"
+                [width]="500"
+                [trigger]="triggerObservable"
+                (imageCapture)="handleImage($event)">
+              </webcam>
+
+              <hr class="border border-primary border-3 opacity-75">
+              <button mat-flat-button color="accent" *ngIf="mostrarWebcam" (click)="triggerCaptura()">Take Photo
+              </button>
+              <button mat-flat-button color="warn" *ngIf="!mostrarWebcam" (click)="toggleWebcam()">Retake Photo</button>
+            </div>
+          </div>
+
+          <mat-divider
+            class="mat-divider mat-divider-vertical"
+            role="separator"
+            aria-orientation="vertical">
+          </mat-divider>
+
+          <!-- Formulario -->
+          <div class="col-lg-5">
+            <div class="card">
+              <h5 class="resaltado">
+                In order to use the face ID, confirm this information <i class="bi bi-camera"></i>
+              </h5>
+              <hr class="border border-primary border-3 opacity-75">
+
+              <form [formGroup]="form" (ngSubmit)="saveFaceId()" class="m-t-30">
+                <button mat-flat-button color="accent" class="w-100">
+                  Modify key photo
+                </button>
+                <hr class="border border-primary border-3 opacity-75">
+
+                <div class="d-flex align-items-center m-b-16">
+                  <!-- Mostrar la imagen previa si ya fue capturada o subida -->
+                  <img *ngIf="imagePreview" [src]="imagePreview" alt="Preview Image" width="100" class="rounded-circle">
+                  <button mat-flat-button color="primary"
+                          class="m-l-16 input-file-button mdc-button mdc-button--unelevated mat-mdc-unelevated-button mat-primary mat-mdc-button-base"
+                          mat-ripple-loader-class-name="mat-mdc-button-ripple">
+          <span class="mdc-button__label">
+            <input type="file" (change)="onFileSelected($event)">
+          </span>
+                  </button>
                 </div>
-            </mat-card-content>
-        </mat-card>
-    </mat-card-content>
+
+                <hr class="border border-primary border-3 opacity-75">
+
+                <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">
+                  Password
+                </mat-label>
+                <mat-form-field appearance="outline" class="w-100" color="primary">
+                  <input matInput type="password" formControlName="password"/>
+                </mat-form-field>
+
+                <hr class="border border-primary border-3 opacity-75">
+
+                <button mat-flat-button color="primary" class="w-100" [disabled]="form.invalid">
+                  Save changes
+                </button>
+
+                <hr class="border border-primary border-3 opacity-75">
+
+                <button mat-flat-button color="warn" class="w-100">
+                  Cancel
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-card-content>
 </mat-card>

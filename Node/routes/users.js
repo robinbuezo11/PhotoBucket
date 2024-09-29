@@ -298,4 +298,62 @@ router.get('/logingCamera', async (req, res) => {
     return await compareImages(currentPicture[0].url, url)
 });
 
+router.post('/faceId', async (req, res) => {
+    try {
+        const { id, recimagen, recactivo } = req.body;
+        let [rows] = await db.query('SELECT * FROM USUARIO WHERE ID = ?', [id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado', message: 'Usuario no encontrado' });
+        }
+
+        let newRecImagen = null;
+        const reconocimiento = recactivo ? 1 : 0;
+
+        if (recimagen) {
+            if (!recactivo) {
+                return res.status(400).json({ error: 'Debe activar el reconocimiento facial', message: 'Debe activar el reconocimiento facial para subir una imagen' });
+            }
+
+            const recimageBuffer = Buffer.from(recimagen.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+            const params = {
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Key: `Fotos_Reconocimiento_Facial/${rows[0].USUARIO}-${Date.now()}.png`,
+                Body: recimageBuffer,
+                ContentEncoding: 'base64',
+                ContentType: 'image/png'
+            };
+            const upload = new Upload({ client: s3, params });
+            const s3Data = await upload.done();
+            newRecImagen = s3Data.Location;
+        } else {
+            if (recactivo) {  
+                return res.status(400).json({ error: 'Debe subir una imagen para activar el reconocimiento facial', message: 'Debe subir una imagen para activar el reconocimiento facial' });
+            }
+        }
+
+        const query = 'UPDATE USUARIO SET RECACTIVO = ?, RECIMAGEN = ? WHERE ID = ?';
+        await db.query(query, [reconocimiento, newRecImagen, id]);
+        const [usert] = await db.query('SELECT * FROM USUARIO WHERE ID = ?', [id]);
+        const updatedUser = usert[0];
+
+        const userData = {
+            id: updatedUser.ID,
+            usuario: updatedUser.USUARIO,
+            correo: updatedUser.CORREO,
+            imagen: updatedUser.IMAGEN,
+            recactivo: updatedUser.RECACTIVO,
+            recimagen: updatedUser.RECIMAGEN,
+            creacion: updatedUser.CREACION
+        };
+        res.json(userData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message, message: 'Error en el servidor' });
+    }
+
+    console.log('POST /faceId');
+});
+
+
+
 module.exports = router;

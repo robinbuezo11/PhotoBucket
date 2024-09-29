@@ -47,5 +47,23 @@ export class UsersService {
       })
     );
   }
+
+  faceId(credentials: any): Observable<any> {
+    return this.http.post(this.apiURL + 'faceId', credentials).pipe(
+      tap((response: any) => {
+        sessionStorage.setItem('userData', JSON.stringify(response));
+        this.userDataSubject.next(response);
+      })
+    );
+  }
+
+  loginWithFaceId(credentials: any): Observable<any> {
+    return this.http.post(this.apiURL + 'logingCamera', credentials).pipe(
+      tap((response: any) => {
+        sessionStorage.setItem('userData', JSON.stringify(response));
+        this.userDataSubject.next(response);
+      })
+    );
+  }
 }
 

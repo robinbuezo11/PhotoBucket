@@ -3,6 +3,7 @@ import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { Subject, Observable } from 'rxjs';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-face-id',
@@ -10,13 +11,18 @@ import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
   styleUrls: ['./face-id.component.scss']
 })
 export class FaceIdComponent {
-  form: FormGroup ;
-  isSwitchOn: boolean = false; // Variable para almacenar el estado del switch
+  form: FormGroup
 
+  isSwitchOn: boolean = false;
   mostrarWebcam = true;
+  recimagen: string | null = null;
+
   permitirCambioCamara = true;
   multiplesCamarasDisponibles = false;
   dispositivoId: string = '';
+  user: any;
+
+  imagePreview: string | ArrayBuffer | null = null;
 
   public opcionesVideo: MediaTrackConstraints = {
     width: { ideal: 1024 },
@@ -28,14 +34,32 @@ export class FaceIdComponent {
   trigger: Subject<void> = new Subject<void>();
   siguienteWebcam: Subject<boolean|string> = new Subject<boolean|string>();
 
-  constructor() { 
+  constructor(
+    private router: Router,
+  ) {
     this.form = new FormGroup({
       password: new FormControl('', [Validators.required]),
     });
   }
 
+  ngOnInit(): void {
+    this.loadUserProfile();
+  }
+
+  loadUserProfile() {
+    this.user = JSON.parse(sessionStorage.getItem('userData') || '{}');
+    console.log(this.user);
+    if (this.user && this.user.token) {
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
   onToggleChange(event: MatSlideToggleChange): void {
-    this.isSwitchOn = event.checked; // Actualiza el estado basado en el evento del switch
+    this.isSwitchOn = event.checked;
+    if (!this.isSwitchOn) {
+      this.mostrarWebcam = false;
+      this.recimagen = null;
+    }
   }
 
   public triggerCaptura(): void {
@@ -56,7 +80,8 @@ export class FaceIdComponent {
 
   public handleImage(imagenWebcam: WebcamImage): void {
     console.info('Imagen de la webcam recibida: ', imagenWebcam);
-    this.imagenWebcam = imagenWebcam;
+    this.recimagen  = imagenWebcam.imageAsDataUrl;
+    this.mostrarWebcam = false;
   }
 
   public cameraSwitched(dispositivoId: string): void {
@@ -74,6 +99,29 @@ export class FaceIdComponent {
 
   get f() {
     return this.form.controls;
+  }
+
+  onFileSelected(event: Event): void {
+    const fileInput = event.target as HTMLInputElement;
+
+    if (fileInput.files && fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+
+      // Asegúrate de que el archivo sea una imagen
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          // Asigna la imagen cargada a la variable imagePreview
+          this.imagePreview = reader.result;
+        };
+
+        // Carga la imagen seleccionada como una URL temporal
+        reader.readAsDataURL(file);
+      } else {
+        console.error('El archivo seleccionado no es una imagen');
+      }
+    }
   }
 
   saveFaceId() {

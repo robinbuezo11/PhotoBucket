@@ -17,18 +17,40 @@
     </div>
   </mat-card-content>
 </mat-card>
-<!--div class="col-sm-12 col-lg-12">
-   <mat-card>
-     <p>Albunes</p>
-     <button mat-fab class="prev" matTooltip="Previous" (click)="prevImage()">
-       <mat-icon>navigate_before</mat-icon>
-     </button>
-     <button mat-fab class="next" matTooltip="Next" (click)="nextImage()">
-       <mat-icon>navigate_next</mat-icon>
-     </button>
-     <img mat-card-image class="image-container slide-image" style="height: 88vh" src="/assets/images/products/p1.jpg">
-   </mat-card>
- </div-->
+
+<div class="row align-items-center d-flex">
+  <button (click)="prevItem()" mat-icon-button>
+    <i-tabler
+      class="routeIcon"
+      name="arrow-big-left-filled"
+      matListItemIcon
+    ></i-tabler>
+  </button>
+
+  <div class="col-11 d-flex justify-content-between" *ngIf="albums">
+    <div *ngFor="let albumcard of albums; let i = index"
+         [hidden]="!isVisible(i)" class="col-sm-6 col-lg-3 px-3">
+      <mat-card class="cardWithShadow productcard overflow-hidden">
+        <mat-card-content class="p-b-24 p-t-12">
+          <mat-card-title class="mat-headline-2 f-s-16 m-b-4">{{ albumcard.nombre }}</mat-card-title>
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              <h6 class="mat-body-2 f-w-600">${{ albumcard.price }}</h6>
+              <span class="f-s-14 m-l-4 text-decoration-line-through">${{ albumcard.rprice }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  <button (click)="nextItem()" mat-icon-button>
+    <i-tabler
+      class="routeIcon"
+      name="arrow-big-right-filled"
+      matListItemIcon
+    ></i-tabler>
+  </button>
+</div>
 
 <div class="row">
   <div class="col-sm-6 col-lg-3" *ngFor="let imagen of imagenes">

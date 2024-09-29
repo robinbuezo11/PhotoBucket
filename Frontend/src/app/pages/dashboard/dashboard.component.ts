@@ -63,13 +63,21 @@ export class AppDashboardComponent implements OnInit{
   currentselected: any = '../assets/img1.jpg';
   prevselected: any;
   imagenes : any = [];
+  albums : any = [];
   user: any;
+  currentIndex = 0;
+  itemsPerPage = 4;
+  animate = false;
 
   ngOnInit(): void {
     this.user = JSON.parse(sessionStorage.getItem('userData') || '{}');
     if (this.user && this.user.token) {
       this.router.navigate(['/dashboard']);
     }
+    this.albumService.getAlbumsByUser(this.user.id).subscribe((response) => {
+      console.log(response);
+      this.albums = response;
+    });
     this.imageService.getImagesByUser(this.user.id).subscribe((response) => {
       console.log(response);
       this.imagenes = response;
@@ -112,6 +120,7 @@ export class AppDashboardComponent implements OnInit{
   constructor(
     private router: Router,
     private imageService: ImagesService,
+    private albumService: AlbumsService,
     private _snackBar: MatSnackBar,
     private dialog: MatDialog,
   ) {
@@ -148,5 +157,23 @@ export class AppDashboardComponent implements OnInit{
   goToDetails(imageId: number) {
     this.router.navigate(['/extra/detail-image', imageId]);
   }
+
+  prevItem() {
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+    }
+  }
+
+  nextItem() {
+    if (this.currentIndex < this.images.length - this.itemsPerPage) {
+      this.currentIndex++;
+    }
+  }
+
+  isVisible(index: number): boolean {
+    return index >= this.currentIndex && index < this.currentIndex + this.itemsPerPage;
+  }
+
+
 
 }
