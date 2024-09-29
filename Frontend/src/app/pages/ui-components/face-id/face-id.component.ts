@@ -4,6 +4,8 @@ import { Subject, Observable } from 'rxjs';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
 import {Router} from "@angular/router";
+import { UsersService} from "../../../services/users.service";
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-face-id',
@@ -36,6 +38,8 @@ export class FaceIdComponent {
 
   constructor(
     private router: Router,
+    private usersService: UsersService,
+    private snackBar: MatSnackBar
   ) {
     this.form = new FormGroup({
       password: new FormControl('', [Validators.required]),
@@ -49,8 +53,14 @@ export class FaceIdComponent {
   loadUserProfile() {
     this.user = JSON.parse(sessionStorage.getItem('userData') || '{}');
     console.log(this.user);
-    if (this.user && this.user.token) {
-      this.router.navigate(['/dashboard']);
+
+    if (this.user) {
+      this.isSwitchOn = this.user.recactivo === 1;
+
+      if (this.isSwitchOn) {
+        this.mostrarWebcam = false;
+        this.recimagen = this.user.recimagen;
+      }
     }
   }
 
@@ -72,6 +82,7 @@ export class FaceIdComponent {
 
   public handleInitError(error: WebcamInitError): void {
     this.errors.push(error);
+    this.snackBar.open('Error al inicializar la webcam: ' + error.message, 'Cerrar', { duration: 5000 });
   }
 
   public showNextWebcam(directionOrDeviceId: boolean|string): void {
@@ -103,28 +114,46 @@ export class FaceIdComponent {
 
   onFileSelected(event: Event): void {
     const fileInput = event.target as HTMLInputElement;
-
     if (fileInput.files && fileInput.files.length > 0) {
       const file = fileInput.files[0];
-
-      // Asegúrate de que el archivo sea una imagen
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
-
         reader.onload = () => {
-          // Asigna la imagen cargada a la variable imagePreview
           this.imagePreview = reader.result;
+          this.mostrarWebcam = false;
         };
-
-        // Carga la imagen seleccionada como una URL temporal
         reader.readAsDataURL(file);
       } else {
-        console.error('El archivo seleccionado no es una imagen');
+        this.snackBar.open('El archivo seleccionado no es una imagen', 'Cerrar', { duration: 5000 });
       }
     }
   }
 
-  saveFaceId() {
 
+  saveFaceId() {
+    if (this.recimagen) {
+      const { password } = this.form.value;
+
+      let faceIdData = {
+        id : this.user.id,
+        recimagen: this.recimagen,
+        recactivo: true,
+        confirma_password: password
+      };
+
+      this.usersService.saveFaceId(faceIdData).subscribe(
+        (response) => {
+          console.log(response);
+          if (response) {
+            this.snackBar.open('Reconocimiento facial guardado con éxito', 'Cerrar', { duration: 5000 });
+          }
+        },
+        (error) => {
+          this.snackBar.open('Error al guardar el reconocimiento facial: ' + error.message, 'Cerrar', { duration: 5000 });
+        }
+      );
+    } else {
+      this.snackBar.open('Debe capturar o subir una imagen', 'Cerrar', { duration: 5000 });
+    }
   }
 }

@@ -48,7 +48,7 @@ export class UsersService {
     );
   }
 
-  faceId(credentials: any): Observable<any> {
+  saveFaceId(credentials: any): Observable<any> {
     return this.http.post(this.apiURL + 'faceId', credentials).pipe(
       tap((response: any) => {
         sessionStorage.setItem('userData', JSON.stringify(response));
