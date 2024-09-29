@@ -1,5 +1,6 @@
 const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const { Upload } = require("@aws-sdk/lib-storage");
+const  compareImages  = require('../utils/compare.images');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
@@ -292,18 +293,45 @@ router.delete('/eliminar/', async (req, res) => {
     console.log('DELETE /usuarios/eliminar');
 });
 
-router.get('/logingCamera', async (req, res) => {
-    const currentPicture = await this.obtenerFotoPerfilUsuario(correo);
-    const url = await uploader.uploadImage(picture, 'login');
-    return await compareImages(currentPicture[0].url, url)
+router.post('/logingCamera', async (req, res) => {
+    try {
+        const { picture } = req.body;
+        if (!picture) {
+            return res.status(400).json({ error: 'No se proporcionó ninguna imagen' });
+        }
+        const [userRows] = await db.query('SELECT RECIMAGEN FROM USUARIO');
+        if (userRows.length === 0) {
+            return res.status(404).json({ error: 'No hay usuarios registrados' });
+        }
+        for (const user of userRows) {
+            const currentPicture = user.RECIMAGEN;
+            const url = await uploader.uploadImage(picture, 'login');
+            const comparisonResult = await compareImages(currentPicture, url);
+            if (comparisonResult) {
+                return res.status(200).json({ message: 'Acceso concedido' });
+            }
+        }
+        return res.status(401).json({ error: 'Acceso denegado' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message, message: 'Error en el servidor' });
+    }
 });
 
 router.post('/faceId', async (req, res) => {
     try {
-        const { id, recimagen, recactivo } = req.body;
+        const { id, recimagen, recactivo, confirma_password } = req.body;
         let [rows] = await db.query('SELECT * FROM USUARIO WHERE ID = ?', [id]);
+        let user;
+
         if (rows.length === 0) {
             return res.status(404).json({ error: 'Usuario no encontrado', message: 'Usuario no encontrado' });
+        } else {
+            user = rows[0];
+            const match = await bcrypt.compare(confirma_password, user.CONTRASENA);
+            if (!match) {
+                return res.status(401).json({ error: 'Contraseña incorrecta', message: 'Contraseña incorrecta' });
+            }
         }
 
         let newRecImagen = null;

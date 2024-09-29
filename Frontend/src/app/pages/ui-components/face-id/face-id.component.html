@@ -54,7 +54,9 @@
               <h5 class="resaldato2">Camera <i class="bi bi-camera"></i></h5>
               <hr class="border border-primary border-3 opacity-75">
 
-              <img *ngIf="recimagen && !mostrarWebcam" [src]="recimagen" alt="Captured Face ID" width="500">
+              <div *ngIf="recimagen">
+                <img [src]="recimagen" alt="Reconocimiento facial" class="rec-imagen" width="100%">
+              </div>
 
               <webcam
                 *ngIf="mostrarWebcam"
