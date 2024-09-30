@@ -294,31 +294,57 @@ router.delete('/eliminar/', async (req, res) => {
 });
 
 router.post('/loginCamera', async (req, res) => {
-    const { picture } = req.body;
     try {
+        const { picture } = req.body;
+
+        // Verificación básica de la imagen proporcionada
+        if (!picture) {
+            return res.status(400).json({ message: 'La imagen es requerida.' });
+        }
+
         const tempFileName = `temp_${Date.now()}`;
         const capturedImageUrl = await uploadImageToS3(picture, tempFileName);
 
-        const [userRows] = await db.query('SELECT ID, USUARIO, RECIMAGEN FROM USUARIO');
-
+        const [userRows] = await db.query('SELECT ID, USUARIO, RECIMAGEN FROM USUARIO WHERE RECIMAGEN IS NOT NULL AND RECACTIVO = 1');
         if (userRows.length === 0) {
             return res.status(404).json({ message: 'No hay usuarios registrados' });
         }
-        
-        console.log('userRows', userRows);
-        console.log('capturedImageUrl', capturedImageUrl);
 
-        const comparisonPromises = userRows.map(user => compareImages(capturedImageUrl, user.RECIMAGEN));
-        const results = await Promise.all(comparisonPromises);
+        let usuarioReconocido = null;
+        let similitudReconocida = null;
 
-        const recognizedUser = results.find(result => result.recognized);
+        for (const user of userRows) {
+            console.log('images compared; ', capturedImageUrl,  user.RECIMAGEN);
+            const result = await compareImages(capturedImageUrl, user.RECIMAGEN);
 
-        if (recognizedUser) {
-            return res.json({
-                message: 'Usuario reconocido',
-                usuario: recognizedUser.user,
-                similarity: recognizedUser.similarity,
-            });
+            console.log('result', result);
+
+            // Verificar que 'result' sea un array y que contenga FaceMatches con Similarity mayor a 80
+            if (result.length > 0 && result[0].Similarity > 80) {
+                const similarity = result[0].Similarity;
+                usuarioReconocido = user.ID;
+                similitudReconocida = similarity;
+                console.log('Usuario reconocido:', usuarioReconocido, 'Similitud:', similarity);
+                break;
+            }
+        }
+
+        if (usuarioReconocido) {
+            let [rows] = await db.query('SELECT * FROM USUARIO WHERE ID = ?', [usuarioReconocido]);
+            if (rows.length === 0) {
+                return res.status(401).json({ error: 'Usuario no encontrado', message: 'Usuario no encontrado' });
+            }
+            const user = rows[0];
+            const userData = {
+                id: user.ID,
+                usuario: user.USUARIO,
+                correo: user.CORREO,
+                imagen: user.IMAGEN,
+                recactivo: user.RECACTIVO,
+                recimagen: user.RECIMAGEN,
+                creacion: user.CREACION
+            };
+            return res.status(200).json(userData);
         }
 
         return res.status(200).json({ message: 'Usuario no reconocido' });
@@ -328,6 +354,7 @@ router.post('/loginCamera', async (req, res) => {
         return res.status(500).json({ message: 'Error en el reconocimiento facial', error: error.message });
     }
 });
+
 
 async function uploadImageToS3(base64Image, userId) {
     const recimageBuffer = Buffer.from(base64Image.replace(/^data:image\/\w+;base64,/, ''), 'base64');

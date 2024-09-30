@@ -13,29 +13,13 @@ import { AlbumsService } from "../../services/albums.service";
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
-
-
-import {
-  ApexChart,
-  ChartComponent,
-  ApexDataLabels,
-  ApexLegend,
-  ApexStroke,
-  ApexTooltip,
-  ApexAxisChartSeries,
-  ApexXAxis,
-  ApexYAxis,
-  ApexGrid,
-  ApexPlotOptions,
-  ApexFill,
-  ApexMarkers,
-  ApexResponsive,
-  NgApexchartsModule,
-} from 'ng-apexcharts';
+import { NgApexchartsModule } from 'ng-apexcharts';
 import {MatChip} from "@angular/material/chips";
 import {DialogComponentComponent} from "../extra/dialog-component/dialog-component.component";
 import {NewAlbumComponent} from "../extra/new-album/new-album.component";
 import {ImageComponent} from "../extra/image/image.component";
+import {MatListItemIcon} from "@angular/material/list";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-dashboard',
@@ -52,7 +36,9 @@ import {ImageComponent} from "../extra/image/image.component";
     MatTableModule,
     CommonModule,
     MatFormFieldModule,
-    MatChip
+    MatChip,
+    MatListItemIcon,
+    MatTooltip
   ],
 })
 
@@ -147,6 +133,10 @@ export class AppDashboardComponent implements OnInit{
       width: '500px',
     });
 
+    dialogRef.componentInstance.albumSaved.subscribe((newAlbum) => {
+      this.albums.push(newAlbum);
+    });
+
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined) {
         console.log('Result from dialog:', result);
@@ -174,6 +164,54 @@ export class AppDashboardComponent implements OnInit{
     return index >= this.currentIndex && index < this.currentIndex + this.itemsPerPage;
   }
 
+  deleteAlbum(albumId: string) {
+    const dataAlbum = {
+      usuario: this.user.id,
+      album: albumId,
+    };
 
+    this.albumService.deleteAlbum(dataAlbum).subscribe({
+      next: (response) => {
+        this.albums = this.albums.filter((album: any) => album.id !== albumId);
+        this._snackBar.open('Álbum eliminado exitosamente', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['snackbar-success']
+        });
+        this.imageService.getImagesByUser(this.user.id).subscribe((response) => {
+          console.log('Imágenes actualizadas:', response);
+          this.imagenes = response;
+        });
+      },
+      error: (error) => {
+        this._snackBar.open('Error al eliminar el álbum: ' + error.message, 'Cerrar', {
+          duration: 3000,
+          panelClass: ['snackbar-error']
+        });
+      }
+    });
+  }
 
+  editAlbum(album: any) {
+    const dialogRef = this.dialog.open(DialogComponentComponent, {
+      width: '500px',
+      data: {
+        title: 'Edit Album',
+        album: album,
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== undefined) {
+        console.log('Result from dialog:', result);
+        this.albumService.updateAlbum(result).subscribe((response) => {
+          this.albums = this.albums.map((album: any) => {
+            if (album.id === result.id) {
+              return result;
+            }
+            return album;
+          });
+        });
+      }
+    });
+  }
 }

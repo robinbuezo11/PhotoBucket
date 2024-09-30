@@ -1,6 +1,6 @@
 $mat-primary: (
   100: white,
-  500: #505254,
+  500: #0780f3,
   700: #1e2f3b,
   contrast: (
     100: white,
@@ -41,7 +41,7 @@ $bluetheme: mat.define-light-theme(
       accent: $theme-accent,
       warn: $theme-warn,
     ),
-    
+
     typography:
       mat.define-typography-config(
         $font-family: "Plus Jakarta Sans",

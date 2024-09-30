@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import {Component, EventEmitter, Inject, Output} from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AlbumsService } from 'src/app/services/albums.service';
@@ -11,6 +11,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./new-album.component.scss']
 })
 export class NewAlbumComponent {
+  @Output() albumSaved = new EventEmitter<any>();
+
   form: FormGroup;
   user: any;
 
@@ -48,6 +50,7 @@ export class NewAlbumComponent {
       (response) => {
         console.log('Álbum creado con éxito:', response);
         this.snackBar.open('Álbum creado con éxito!', 'Cerrar', { duration: 3000 });
+        this.albumSaved.emit(response);
         this.dialogRef.close();
       },
       (error) => {

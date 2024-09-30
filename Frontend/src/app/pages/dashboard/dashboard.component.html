@@ -18,38 +18,53 @@
   </mat-card-content>
 </mat-card>
 
-<div class="row align-items-center d-flex">
-  <button (click)="prevItem()" mat-icon-button>
-    <i-tabler
-      class="routeIcon"
-      name="arrow-big-left-filled"
-      matListItemIcon
-    ></i-tabler>
-  </button>
-
-  <div class="col-11 d-flex justify-content-between" *ngIf="albums">
-    <div *ngFor="let albumcard of albums; let i = index"
-         [hidden]="!isVisible(i)" class="col-sm-6 col-lg-3 px-3">
-      <mat-card class="cardWithShadow productcard overflow-hidden">
-        <mat-card-content class="p-b-24 p-t-12">
-          <mat-card-title class="mat-headline-2 f-s-16 m-b-4">{{ albumcard.nombre }}</mat-card-title>
-          <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-              <h6 class="mat-body-2 f-w-600">${{ albumcard.price }}</h6>
-              <span class="f-s-14 m-l-4 text-decoration-line-through">${{ albumcard.rprice }}</span>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+<div class="row">
+  <div class="col-sm-12 col-lg-12">
+    <div class="row align-items-center d-flex">
+      <button (click)="prevItem()" mat-icon-button>
+        <i-tabler
+          class="routeIcon"
+          name="arrow-big-left-filled"
+          matListItemIcon
+        ></i-tabler>
+      </button>
+      <div class="col-11 d-flex justify-content-between" *ngIf="albums">
+        <div *ngFor="let albumcard of albums; let i = index"
+             [hidden]="!isVisible(i)" class="col-sm-6 col-lg-3 px-3">
+          <mat-card class="cardWithShadow productcard overflow-hidden">
+            <mat-card-content class="p-b-24 p-t-12">
+              <mat-card-title class="mat-headline-2 f-s-16 m-b-4">{{ albumcard.nombre }}</mat-card-title>
+              <div class="m-t-20">
+                <section>
+                  <div class="example-button-row">
+                    <div class="example-flex-container">
+                      <div class="example-button-container">
+                        <button mat-fab color="primary" aria-label="Example icon button with a delete icon" matTooltip="Delete the album" (click)="deleteAlbum(albumcard.id)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
+                      <div class="example-button-container">
+                        <button mat-fab color="accent" aria-label="Example icon button with a bookmark icon" matTooltip="Edit the album">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+      <button (click)="nextItem()" mat-icon-button>
+        <i-tabler
+          class="routeIcon"
+          name="arrow-big-right-filled"
+          matListItemIcon
+        ></i-tabler>
+      </button>
     </div>
   </div>
-  <button (click)="nextItem()" mat-icon-button>
-    <i-tabler
-      class="routeIcon"
-      name="arrow-big-right-filled"
-      matListItemIcon
-    ></i-tabler>
-  </button>
 </div>
 
 <div class="row">

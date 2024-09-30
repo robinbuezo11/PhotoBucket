@@ -123,3 +123,43 @@
     transform: translateX(0px);
   }
 }
+
+.album-card-container {
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.example-label {
+  display: table-cell;
+  font-size: 14px;
+  margin-left: 8px;
+  min-width: 120px;
+}
+
+.example-button-row {
+  display: flex;
+  max-width: 600px;
+}
+
+.example-button-row .mat-mdc-button-base {
+  margin: 8px 8px 8px 0;
+}
+
+.example-flex-container {
+  display: flex;
+  justify-content: space-between; /* Mantén esto si quieres que los botones estén separados */
+  align-items: center; /* Asegura que estén alineados verticalmente */
+  gap: 10px; /* Añade un espacio entre los botones si es necesario */
+  flex-wrap: nowrap; /* Evita que los botones se vayan a otra línea */
+}
+
+.example-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Elimina el width fijo */
+}
+
+section {
+  display: block;
+}

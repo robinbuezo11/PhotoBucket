@@ -67,15 +67,15 @@ export class FaceIDComponent implements AfterViewInit, OnDestroy {
 
     this.usersService.loginWithFaceId(imageBase64).subscribe({
       next: (response: any) => {
-        if (response.message === 'Usuario reconocido') {
+        if (response) {
           localStorage.setItem('user', JSON.stringify(response.usuario));
           this.router.navigate(['/dashboard']);
           this.snackBar.open('Inicio de sesión exitoso', 'Cerrar', { duration: 2000 });
           this.dialogRef.close(true);
         } else {
-          this.attemptCount++; // Incrementa el contador de intentos
+          this.attemptCount++;
           this.snackBar.open('Usuario no reconocido', 'Intentar de nuevo', { duration: 2000 });
-          this.handleLoginAttempts(); // Verifica si se deben realizar más intentos
+          this.handleLoginAttempts();
         }
       },
       error: (error: any) => {

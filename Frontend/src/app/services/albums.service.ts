@@ -28,8 +28,8 @@ export class AlbumsService {
     return this.http.post(this.apiURL + 'crear', album);
   }
 
-  deleteAlbum(id: string): Observable<any> {
-    return this.http.delete(this.apiURL + 'eliminar/' + id);
+  deleteAlbum(album: any): Observable<any> {
+    return this.http.post(this.apiURL + 'eliminar', album);
   }
 
   updateAlbum(album: any): Observable<any> {

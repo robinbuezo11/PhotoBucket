@@ -7,7 +7,6 @@ const express = require('express');
 const router = express.Router();
 const db = require('../utils/db');
 
-// Configure AWS
 const s3 = new S3Client({
     region: process.env.AWS_REGION,
     credentials: {
@@ -16,7 +15,6 @@ const s3 = new S3Client({
     }
 });
 
-// Get all albums
 router.get('/', async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM ALBUM;');
@@ -36,9 +34,9 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:userId', async (req, res) => {
-    const userId = req.params.userId; // Obtener el ID del usuario desde los parámetros de la ruta
+    const userId = req.params.userId;
     try {
-        const [rows] = await db.query('SELECT * FROM ALBUM WHERE USUARIO = ?;', [userId]); // Filtrar por usuario
+        const [rows] = await db.query('SELECT * FROM ALBUM WHERE USUARIO = ?;', [userId]);
         const albums = rows.map(album => {
             return {
                 id: album.ID,
@@ -54,8 +52,6 @@ router.get('/:userId', async (req, res) => {
     console.log(`GET /albums/${userId}`);
 });
 
-
-// Create album
 router.post('/crear', async (req, res) => {
     try {
         const { usuario, nombreAlbum } = req.body;
@@ -71,9 +67,6 @@ router.post('/crear', async (req, res) => {
     console.log('POST /album/crear');
 });
 
-
-
-// Update album
 router.post('/actualizar', async (req, res) => {
     try {
         const { usuario, album,  nombre} = req.body;
@@ -88,17 +81,48 @@ router.post('/actualizar', async (req, res) => {
     console.log('POST /album/actualizar');
 });
 
-// Delete album
+
 router.post('/eliminar', async (req, res) => {
+    const connection = await db.getConnection();  // Obtener una conexión de la pool de conexiones
     try {
         const { usuario, album } = req.body;
 
-        // Borrar album de la base de datos
-        const [result] = await db.query('DELETE FROM ALBUM WHERE USUARIO = ? AND ID = ?;', [usuario, album]);
-        res.json({ message: 'Álbum eliminado' });
-    }
-    catch (error) {
-        res.status(500).json({ error: error.message, message: 'Error al eliminar el álbum' });
+        // Iniciar la transacción
+        await connection.beginTransaction();
+
+        // Obtener las imágenes asociadas al álbum
+        const [images] = await connection.query('SELECT IMAGEN FROM IMAGEN WHERE ALBUM = ?', [album]);
+        if (images.length > 0) {
+            for (const img of images) {
+                const imageUrl = img.IMAGEN;
+                const imageName = imageUrl.split('/').pop();
+                const deleteParams = {
+                    Bucket: process.env.AWS_BUCKET_NAME,
+                    Key: `Fotos_Publicadas/${imageName}`,
+                };
+
+                // Eliminar imagen del bucket S3
+                await s3.send(new DeleteObjectCommand(deleteParams));
+            }
+
+            // Eliminar imágenes de la base de datos
+            await connection.query('DELETE FROM IMAGEN WHERE ALBUM = ?', [album]);
+        }
+
+        // Eliminar el álbum de la base de datos
+        await connection.query('DELETE FROM ALBUM WHERE USUARIO = ? AND ID = ?', [usuario, album]);
+
+        // Confirmar transacción
+        await connection.commit();
+
+        res.json({ message: 'Álbum e imágenes eliminadas exitosamente' });
+    } catch (error) {
+        // Revertir la transacción en caso de error
+        await connection.rollback();
+        console.error('Error al eliminar el álbum y sus imágenes:', error);
+        res.status(500).json({ error: error.message, message: 'Error al eliminar el álbum y sus imágenes' });
+    } finally {
+        connection.release();  // Liberar la conexión de vuelta a la pool
     }
     console.log('POST /album/eliminar');
 });

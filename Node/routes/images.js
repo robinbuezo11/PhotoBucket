@@ -209,7 +209,6 @@ router.delete('/eliminar', async (req, res) => {
     console.log('DELETE /imagenes/eliminar');
 });
 
-
 router.post('/analyzeImage', async (req, res) => {
     try {
         const { imagen } = req.body;

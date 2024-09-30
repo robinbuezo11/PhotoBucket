@@ -120,6 +120,7 @@ export class FaceIdComponent {
         const reader = new FileReader();
         reader.onload = () => {
           this.imagePreview = reader.result;
+          this.recimagen = reader.result as string;
           this.mostrarWebcam = false;
         };
         reader.readAsDataURL(file);
@@ -129,7 +130,6 @@ export class FaceIdComponent {
     }
   }
 
-
   saveFaceId() {
     if (this.recimagen) {
       const { password } = this.form.value;
@@ -137,7 +137,7 @@ export class FaceIdComponent {
       let faceIdData = {
         id : this.user.id,
         recimagen: this.recimagen,
-        recactivo: true,
+        recactivo: this.isSwitchOn,
         confirma_password: password
       };
 
@@ -146,6 +146,7 @@ export class FaceIdComponent {
           console.log(response);
           if (response) {
             this.snackBar.open('Reconocimiento facial guardado con éxito', 'Cerrar', { duration: 5000 });
+            this.router.navigate(['/dashboard']);
           }
         },
         (error) => {

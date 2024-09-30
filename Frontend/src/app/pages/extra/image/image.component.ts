@@ -96,7 +96,7 @@ export class ImageComponent implements OnInit{
             horizontalPosition: 'center',
           });
 
-          this.imageSaved.emit(response); // Emitir la nueva imagen
+          this.imageSaved.emit(response);
         },
         (error) => {
           this.snackBar.open('Error al guardar la imagen: ' + (error.error?.message || 'Error desconocido'), 'Cerrar', {
