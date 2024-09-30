@@ -1,7 +1,5 @@
 <div class="blank-layout-container justify-content-center align-items-center bg-light-primary">
-  <div
-    class="position-relative row w-100 h-100 bg-gredient justify-content-center"
-  >
+  <div class="position-relative row w-100 h-100 bg-gradient justify-content-center">
     <div class="col-lg-4 d-flex align-items-center">
       <mat-card class="cardWithShadow boxed-auth">
         <mat-card-content class="p-32">
@@ -14,7 +12,7 @@
           </div>
           <div class="row m-t-24 custom-row">
             <div class="col-12 col-sm-12">
-              <button mat-stroked-button class="w-100">
+              <button mat-stroked-button class="w-100" (click)="showOverlay()">
                 <div class="d-flex align-items-center">
                   <img
                     src="/assets/images/svgs/face-id-svgrepo-com.svg"

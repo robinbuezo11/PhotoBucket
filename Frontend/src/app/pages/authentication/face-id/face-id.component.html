@@ -1,0 +1,7 @@
+<mat-dialog-content class="mat-mdc-dialog-content mdc-dialog__content mat-typography" style="max-width: 600px;">
+  <h2>Face ID</h2>
+  <div class="video-container" style="position: relative;">
+    <video #videoElement width="100%" class="img-thumbnail"></video>
+    <div class="face-border" *ngIf="isFaceDetected"></div>
+  </div>
+</mat-dialog-content>

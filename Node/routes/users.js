@@ -293,30 +293,61 @@ router.delete('/eliminar/', async (req, res) => {
     console.log('DELETE /usuarios/eliminar');
 });
 
-router.post('/logingCamera', async (req, res) => {
+router.post('/loginCamera', async (req, res) => {
+    const { picture } = req.body;
     try {
-        const { picture } = req.body;
-        if (!picture) {
-            return res.status(400).json({ error: 'No se proporcionó ninguna imagen' });
-        }
-        const [userRows] = await db.query('SELECT RECIMAGEN FROM USUARIO');
+        const tempFileName = `temp_${Date.now()}`;
+        const capturedImageUrl = await uploadImageToS3(picture, tempFileName);
+
+        const [userRows] = await db.query('SELECT ID, USUARIO, RECIMAGEN FROM USUARIO');
+
         if (userRows.length === 0) {
-            return res.status(404).json({ error: 'No hay usuarios registrados' });
+            return res.status(404).json({ message: 'No hay usuarios registrados' });
         }
-        for (const user of userRows) {
-            const currentPicture = user.RECIMAGEN;
-            const url = await uploader.uploadImage(picture, 'login');
-            const comparisonResult = await compareImages(currentPicture, url);
-            if (comparisonResult) {
-                return res.status(200).json({ message: 'Acceso concedido' });
-            }
+        
+        console.log('userRows', userRows);
+        console.log('capturedImageUrl', capturedImageUrl);
+
+        const comparisonPromises = userRows.map(user => compareImages(capturedImageUrl, user.RECIMAGEN));
+        const results = await Promise.all(comparisonPromises);
+
+        const recognizedUser = results.find(result => result.recognized);
+
+        if (recognizedUser) {
+            return res.json({
+                message: 'Usuario reconocido',
+                usuario: recognizedUser.user,
+                similarity: recognizedUser.similarity,
+            });
         }
-        return res.status(401).json({ error: 'Acceso denegado' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message, message: 'Error en el servidor' });
+
+        return res.status(200).json({ message: 'Usuario no reconocido' });
+
+    } catch (error) {
+        console.error('Error en el reconocimiento facial:', error);
+        return res.status(500).json({ message: 'Error en el reconocimiento facial', error: error.message });
     }
 });
+
+async function uploadImageToS3(base64Image, userId) {
+    const recimageBuffer = Buffer.from(base64Image.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+    const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `Fotos_Reconocimiento_Facial/${userId}-${Date.now()}.png`,
+        Body: recimageBuffer,
+        ContentEncoding: 'base64',
+        ContentType: 'image/png',
+    };
+    
+    try {
+        const upload = new Upload({ client: s3, params });
+        const s3Data = await upload.done();
+        return s3Data.Location;
+    } catch (error) {
+        console.error('Error al subir la imagen a S3:', error);
+        throw new Error('Error al subir la imagen a S3');
+    }
+}
 
 router.post('/faceId', async (req, res) => {
     try {

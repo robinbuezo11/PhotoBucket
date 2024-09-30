@@ -57,11 +57,14 @@ export class UsersService {
     );
   }
 
-  loginWithFaceId(credentials: any): Observable<any> {
-    return this.http.post(this.apiURL + 'logingCamera', credentials).pipe(
+  loginWithFaceId(imageBase64: string): Observable<any> {
+    console.log('Imagen base64 enviada:', imageBase64);
+    return this.http.post(this.apiURL + 'loginCamera', { picture: imageBase64 }).pipe(
       tap((response: any) => {
-        sessionStorage.setItem('userData', JSON.stringify(response));
-        this.userDataSubject.next(response);
+        if (response.usuario) {
+          sessionStorage.setItem('userData', JSON.stringify(response));
+          console.log('Usuario reconocido:', response.usuario);
+        }
       })
     );
   }

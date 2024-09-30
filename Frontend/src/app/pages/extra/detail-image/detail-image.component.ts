@@ -47,12 +47,42 @@ export class DetailImageComponent implements OnInit {
   textTranslated: string = '';
   selectedLanguaje : any;
   languajes: { id: string, nombre: string }[] = [
-    { id: 'en', nombre: 'English' },
-    { id: 'es', nombre: 'Spanish' },
-    { id: 'fr', nombre: 'French' },
-    { id: 'de', nombre: 'German' },
-    { id: 'zh', nombre: 'Chinese' }
+    { id: 'ar', nombre: 'Árabe' },
+    { id: 'zh', nombre: 'Chino (Simplificado)' },
+    { id: 'zh-TW', nombre: 'Chino (Tradicional)' },
+    { id: 'cs', nombre: 'Checo' },
+    { id: 'da', nombre: 'Danés' },
+    { id: 'nl', nombre: 'Neerlandés (Holandés)' },
+    { id: 'en', nombre: 'Inglés' },
+    { id: 'et', nombre: 'Estonio' },
+    { id: 'fi', nombre: 'Finlandés' },
+    { id: 'fr', nombre: 'Francés' },
+    { id: 'de', nombre: 'Alemán' },
+    { id: 'el', nombre: 'Griego' },
+    { id: 'he', nombre: 'Hebreo' },
+    { id: 'hi', nombre: 'Hindi' },
+    { id: 'hu', nombre: 'Húngaro' },
+    { id: 'id', nombre: 'Indonesio' },
+    { id: 'it', nombre: 'Italiano' },
+    { id: 'ja', nombre: 'Japonés' },
+    { id: 'ko', nombre: 'Coreano' },
+    { id: 'lv', nombre: 'Letón' },
+    { id: 'no', nombre: 'Noruego' },
+    { id: 'pl', nombre: 'Polaco' },
+    { id: 'pt-BR', nombre: 'Portugués (Brasil)' },
+    { id: 'pt-PT', nombre: 'Portugués (Portugal)' },
+    { id: 'ro', nombre: 'Rumano' },
+    { id: 'ru', nombre: 'Ruso' },
+    { id: 'sk', nombre: 'Eslovaco' },
+    { id: 'sl', nombre: 'Esloveno' },
+    { id: 'es', nombre: 'Español' },
+    { id: 'sv', nombre: 'Sueco' },
+    { id: 'th', nombre: 'Tailandés' },
+    { id: 'tr', nombre: 'Turco' },
+    { id: 'uk', nombre: 'Ucraniano' },
+    { id: 'vi', nombre: 'Vietnamita' }
   ];
+
 
   constructor(
     private route: ActivatedRoute,

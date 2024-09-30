@@ -15,7 +15,10 @@ import { AuthenticationRoutes } from './authentication.routing';
 
 import { AppSideLoginComponent } from './login/login.component';
 import { AppSideRegisterComponent } from './register/register.component';
+import { FaceIDComponent } from "./face-id/face-id.component";
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import {MatDivider} from "@angular/material/divider";
+import {MatDialogActions, MatDialogContent} from "@angular/material/dialog";
 
 @NgModule({
   imports: [
@@ -30,10 +33,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     ReactiveFormsModule,
     TablerIconsModule.pick(TablerIcons),
     MatSnackBarModule,
+    MatDivider,
+    MatDialogContent,
+    MatDialogActions,
   ],
   declarations: [
     AppSideLoginComponent,
     AppSideRegisterComponent,
+    FaceIDComponent,
   ],
 })
 export class AuthenticationModule {}

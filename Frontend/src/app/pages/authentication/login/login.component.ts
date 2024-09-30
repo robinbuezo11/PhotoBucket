@@ -3,6 +3,9 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsersService } from 'src/app/services/users.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import {NewAlbumComponent} from "../../extra/new-album/new-album.component";
+import { FaceIDComponent} from "../face-id/face-id.component";
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +19,7 @@ export class AppSideLoginComponent {
     private router: Router,
     private usersService: UsersService,
     private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {
     this.form = new FormGroup({
       usuario: new FormControl('', [Validators.required]),
@@ -58,4 +62,21 @@ export class AppSideLoginComponent {
       }
     );
   }
+
+  showOverlay() {
+    console.log('Face ID overlay');
+
+    const dialogRef = this.dialog.open(FaceIDComponent, {
+      width: '500px',
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        console.log('Face ID Login successful');
+      } else {
+        console.log('Face ID Login canceled');
+      }
+    });
+  }
+
 }

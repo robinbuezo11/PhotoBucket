@@ -1,9 +1,79 @@
-<mat-card class="cardWithShadow theme-card">
-  <mat-card-header>
-    <mat-card-title class="m-b-0">Albums</mat-card-title>
-  </mat-card-header>
-  <mat-card-content class="b-t-1">
-    <!-- Lista de albunes -->
-
-  </mat-card-content>
-</mat-card>
+<mat-dialog-content
+  class="mat-mdc-dialog-content mdc-dialog__content"
+  style="min-width: 800px; min-height: 500px; max-width: 800px; overflow-y: scroll; scrollbar-width: none; -ms-overflow-style: none">
+  <div class="row">
+    <div class="col-12 justify-content-center d-flex pb-4">
+      <h2 class="mat-mdc-dialog-title mdc-dialog__title m-b-24" mat-dialog-title>Control de albumes</h2>
+    </div>
+    <div class="col-12">
+      <div class="col-12 pb-4">
+        <div class="separator">
+          <span>Agregar Album</span>
+        </div>
+      </div>
+      <div class="row d-flex w-100 pb-4">
+        <form [formGroup]="albumForm" (ngSubmit)="onSubmit()" class="row w-100 align-items-center">
+          <div class="col-4 d-flex align-items-center">
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <mat-label>Nombre del Album</mat-label>
+              <input matInput type="text" formControlName="albumName" />
+            </mat-form-field>
+          </div>
+          <div class="col-3 d-flex align-items-center">
+            <button mat-raised-button color="primary" type="submit" [disabled]="albumForm.invalid">Crear Album</button>
+          </div>
+        </form>
+      </div>
+      <div class="col-12 pb-4">
+        <div class="separator">
+          <span>Eliminar Album</span>
+        </div>
+      </div>
+      <div class="row d-flex w-100 pb-4">
+        <form [formGroup]="deleteAlbumForm" (ngSubmit)="onSubmitDelete()" class="row w-100 align-items-center">
+          <div class="col-4 d-flex align-items-center">
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <mat-label>Seleccione album a eliminar</mat-label>
+              <mat-select formControlName="albumName">
+                @for (a of albumes; track a) {
+                  <mat-option [value]="a.value">{{a.viewValue}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-3 d-flex align-items-center">
+            <button mat-raised-button color="primary" type="submit" [disabled]="albumForm.invalid">Eliminar</button>
+          </div>
+        </form>
+      </div>
+      <div class="col-12 pb-4">
+        <div class="separator">
+          <span>Actualizar Album</span>
+        </div>
+      </div>
+      <div class="row d-flex w-100">
+        <form [formGroup]="updateAlbumForm" (ngSubmit)="onSubmitUpdate()" class="row w-100 align-items-center">
+          <div class="col-4 d-flex align-items-center">
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <mat-label>Seleccione album a modificar</mat-label>
+              <mat-select formControlName="albumName">
+                @for (a of albumes; track a) {
+                  <mat-option [value]="a.value">{{a.viewValue}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-4 d-flex align-items-center">
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <mat-label>Nuevo nombre del album</mat-label>
+              <input matInput type="text" formControlName="albumName" />
+            </mat-form-field>
+          </div>
+          <div class="col-3 d-flex align-items-center">
+            <button mat-raised-button color="primary" type="submit" [disabled]="albumForm.invalid">Renombrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
