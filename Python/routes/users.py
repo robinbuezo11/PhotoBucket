@@ -7,6 +7,9 @@ import base64
 from dotenv import load_dotenv
 from utils.db import get_db_connection
 from datetime import datetime
+import re
+from utils.compareImages import compare_images
+from utils.analyzeImage import analyze_image
 
 # Cargar las variables de entorno
 load_dotenv()
@@ -91,7 +94,7 @@ def login():
             if not bcrypt.checkpw(password.encode('utf-8'), user['CONTRASENA'].encode('utf-8')):
                 return jsonify({'error': 'Contraseña incorrecta', 'message': 'Contraseña incorrecta'}), 401
 
-            # Eliminar el campo de contraseña y devolver los datos necesarios
+            # Formatear los datos del usuario
             user_data = {
                 'id':           user['ID'],
                 'usuario':      user['USUARIO'],
@@ -332,3 +335,126 @@ def delete_user():
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({'error': str(e), 'message': 'Error en el servidor'}), 500
+
+@users_bp.route('/loginCamera', methods=['POST'])
+def login_camera():
+    try:
+        data = request.json
+        picture = data.get('picture')
+        
+        if not picture:
+            return jsonify({'message': 'La imagen es requerida.'}), 400
+        
+        temp_file_name = f'temp_{int(datetime.timestamp(datetime.now()))}'
+        captured_image_url = upload_image_to_s3(picture, temp_file_name)
+        
+        connection = get_db_connection()
+        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute('SELECT ID, USUARIO, RECIMAGEN FROM USUARIO WHERE RECIMAGEN IS NOT NULL AND RECACTIVO = 1')
+            user_rows = cursor.fetchall()
+            
+            if not user_rows:
+                return jsonify({'message': 'No hay usuarios registrados'}), 404
+            
+            usuario_reconocido = None
+            similitud_reconocida = None
+            
+            for user in user_rows:
+                result = compare_images(captured_image_url, user['RECIMAGEN'])
+                if result and isinstance(result, list) and len(result) > 0 and result[0]['Similarity' > 80]:
+                    usuario_reconocido = user['ID']
+                    similitud_reconocida = result[0]['Similarity']
+                    break
+                
+            if usuario_reconocido:
+                cursor.execute('SELECT * FROM USUARIO WHERE ID = %s', (usuario_reconocido,))
+                user_data = cursor.fetchone()
+                return jsonify({
+                    'id': user_data['ID'],
+                    'usuario': user_data['USUARIO'],
+                    'correo': user_data['CORREO'],
+                    'imagen': user_data['IMAGEN'],
+                    'recactivo': user_data['RECACTIVO'],
+                    'recimagen': user_data['RECIMAGEN'],
+                    'creacion': user_data['CREACION']
+                }), 200
+                
+            return jsonify({'message': 'Usuario no reconocido'}), 200
+    except Exception as e:
+        print('Error en el reconocimiento facial:', e)
+        return jsonify({'message': 'Error en el reconocimiento facial', 'error': str(e)}), 500
+    
+# upload image to s3
+def upload_image_to_s3(base64_image, user_id):
+    recimage_buffer = base64.b64decode(re.sub(r'^data:image\/\w+;base64,', '', base64_image))
+    params = {
+        'Bucket': os.getenv('AWS_BUCKET_NAME'),
+        'Key': f'Fotos_Reconocimiento_Facial/{user_id}-{int(time.time())}.png',
+        'Body': recimage_buffer,
+        'ContentEncoding': 'base64',
+        'ContentType': 'image/png'
+    }
+    
+    try:
+        s3_client.put_object(**params)
+        return f"https://{os.getenv('AWS_BUCKET_NAME')}.s3.amazonaws.com/{params['Key']}"
+    except Exception as e:
+        print(f"Error al subir la imagen a S3: {str(e)}")
+        raise Exception('Error al subir la imagen a S3')
+
+@users_bp.route('/faceId', methods=['POST'])
+def face_id():
+    try:
+        data = request.json
+        id = data.get('id')
+        recimagen = data.get('recimagen')
+        recactivo = data.get('recactivo')
+        confirma_password = data.get('confirma_password')
+        
+        connection = get_db_connection()
+        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute('SELECT * FROM USUARIO WHERE ID = %s', (id,))
+            rows = cursor.fetchall()
+            
+            if not rows:
+                return jsonify({'error': 'Usuario no encontrado', 'message': 'Usuario no encontrado'}), 404
+            
+            user = rows[0]
+            match = bcrypt.checkpw(confirma_password.encode('utf-8'), user['CONTRASENA'].encode('utf-8'))
+
+            if not match:
+                return jsonify({'error': 'Contraseña incorrecta', 'message': 'Contraseña incorrecta'}), 401
+
+            new_rec_imagen = None
+            reconocimiento = 1 if recactivo else 0
+
+            if recimagen:
+                if not recactivo:
+                    return jsonify({'error': 'Debe activar el reconocimiento facial', 'message': 'Debe activar el reconocimiento facial para subir una imagen'}), 400
+
+                new_rec_imagen = upload_image_to_s3(recimagen, user['USUARIO'])
+
+            elif recactivo:
+                return jsonify({'error': 'Debe subir una imagen para activar el reconocimiento facial', 'message': 'Debe subir una imagen para activar el reconocimiento facial'}), 400
+
+            query = 'UPDATE USUARIO SET RECACTIVO = %s, RECIMAGEN = %s WHERE ID = %s'
+            cursor.execute(query, (reconocimiento, new_rec_imagen, id))
+            connection.commit()
+
+            cursor.execute('SELECT * FROM USUARIO WHERE ID = %s', (id,))
+            updated_user = cursor.fetchall()[0]
+
+            user_data = {
+                'id': updated_user['ID'],
+                'usuario': updated_user['USUARIO'],
+                'correo': updated_user['CORREO'],
+                'imagen': updated_user['IMAGEN'],
+                'recactivo': updated_user['RECACTIVO'],
+                'recimagen': updated_user['RECIMAGEN'],
+                'creacion': updated_user['CREACION']
+            }
+            return jsonify(user_data)
+
+    except Exception as err:
+        print(err)
+        return jsonify({'error': str(err), 'message': 'Error en el servidor'}), 500
