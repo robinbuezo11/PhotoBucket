@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 })
 export class AlbumsService {
 
-  private apiURL = 'http://127.0.0.1:3001/albumes/'
+  private apiURL = 'http://192.168.0.20:5000/albumes/'
 
   constructor(
     protected http: HttpClient,

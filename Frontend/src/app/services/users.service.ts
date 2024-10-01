@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 })
 export class UsersService {
 
-  private apiURL = 'http://127.0.0.1:3001/usuarios/';
+  private apiURL = 'http://192.168.0.20:5000/usuarios/';
 
   // BehaviorSubject para manejar el estado del usuario
   private userDataSubject = new BehaviorSubject<any>(JSON.parse(sessionStorage.getItem('userData') || '{}'));

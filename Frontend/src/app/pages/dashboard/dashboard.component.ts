@@ -20,6 +20,7 @@ import {NewAlbumComponent} from "../extra/new-album/new-album.component";
 import {ImageComponent} from "../extra/image/image.component";
 import {MatListItemIcon} from "@angular/material/list";
 import {MatTooltip} from "@angular/material/tooltip";
+import { EditAlbumComponent } from '../extra/edit-album/edit-album.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -192,11 +193,11 @@ export class AppDashboardComponent implements OnInit{
   }
 
   editAlbum(album: any) {
-    const dialogRef = this.dialog.open(DialogComponentComponent, {
+    const dialogRef = this.dialog.open(EditAlbumComponent, {
       width: '500px',
       data: {
         title: 'Edit Album',
-        album: album,
+        album: album,  // Enviando los datos del álbum
       }
     });
 

@@ -261,9 +261,13 @@ def update():
             # Hash de la contraseña
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()) if password else user['CONTRASENA']
 
+            # Asegúrate de que recactivo no sea None
+            if recactivo is None:
+                recactivo = user['RECACTIVO']  # Mantén el valor actual si no se proporciona uno nuevo
+
             # Actualizar usuario en la base de datos
             query = 'UPDATE USUARIO SET USUARIO = %s, CORREO = %s, CONTRASENA = %s, IMAGEN = %s, RECACTIVO = %s, RECIMAGEN = %s WHERE ID = %s'
-            cursor.execute(query, (usuario, correo, hashed_password.decode('utf-8'), new_imagen, recactivo, new_recimagen, id))
+            cursor.execute(query, (usuario, correo, hashed_password, new_imagen, recactivo, new_recimagen, id))
             connection.commit()
 
             # Obtener los detalles del usuario actualizado
@@ -389,7 +393,7 @@ def upload_image_to_s3(base64_image, user_id):
     recimage_buffer = base64.b64decode(re.sub(r'^data:image\/\w+;base64,', '', base64_image))
     params = {
         'Bucket': os.getenv('AWS_BUCKET_NAME'),
-        'Key': f'Fotos_Reconocimiento_Facial/{user_id}-{int(time.time())}.png',
+        'Key': f'Fotos_Reconocimiento_Facial/{user_id}-{int(datetime.now().timestamp())}.png',
         'Body': recimage_buffer,
         'ContentEncoding': 'base64',
         'ContentType': 'image/png'

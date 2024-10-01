@@ -10,6 +10,8 @@ from utils.analyzeImage import analyze_image, extract_text
 from utils.translateText import translate_text
 from datetime import datetime
 
+import re
+
 # Cargar las variables de entorno
 load_dotenv()
 
@@ -90,7 +92,7 @@ def get_images_by_usuario(usuarioId):
 @images_bp.route('/image/<int:imageId>', methods=['GET'])
 def get_image_by_id(imageId):
     try:
-        # Conectar a la base de datos
+        print(f"Obteniendo imagen con ID: {imageId}")
         connection = get_db_connection()
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute('SELECT ID, NOMBRE, DESCRIPCION, IMAGEN, ALBUM, CREACION FROM IMAGEN WHERE ID = %s', (imageId,))
@@ -108,6 +110,10 @@ def get_image_by_id(imageId):
             
             image_url = image_row['IMAGEN']
             response = requests.get(image_url)
+
+            if response.status_code != 200:
+                return jsonify({'message': 'No se pudo obtener la imagen desde la URL proporcionada'}), 500
+            
             base64_image = base64.b64encode(response.content).decode('utf-8')
             labels = analyze_image(base64_image)
 
@@ -135,17 +141,14 @@ def upload():
         data = request.get_json()
         nombre = data.get('nombre')
         descripcion = data.get('descripcion')
-        imagen = data.get('imagen')  # imagen en base64
+        imagen = data.get('imagen')
         album = data.get('album')
 
-        # Validación de campos obligatorios
         if not nombre or not imagen or not album:
             return jsonify({'error': 'Faltan campos obligatorios', 'message': 'Faltan campos obligatorios'}), 400
+        
+        image_data = base64.b64decode(re.sub(r'^data:image/\w+;base64,', '', imagen))
 
-        # Procesar la imagen en base64
-        image_data = base64.b64decode(imagen.replace('data:image/png;base64,', ''))
-
-        # Parámetros para subir la imagen a S3
         s3_key = f"Fotos_Publicadas/{nombre}-{int(datetime.timestamp(datetime.now()))}.png"
         try:
             s3_client.put_object(
@@ -159,10 +162,8 @@ def upload():
             print(f"Error al subir la imagen a S3: {str(e)}")
             return jsonify({'error': str(e), 'message': 'Error al subir la imagen a S3'}), 500
 
-        # URL de la imagen en S3
         image_url = f"https://{os.getenv('AWS_BUCKET_NAME')}.s3.amazonaws.com/{s3_key}"
 
-        # Conectar a la base de datos y guardar la información de la imagen
         connection = get_db_connection()
         with connection.cursor() as cursor:
             query = 'INSERT INTO IMAGEN (NOMBRE, DESCRIPCION, IMAGEN, ALBUM) VALUES (%s, %s, %s, %s)'
@@ -172,7 +173,6 @@ def upload():
 
         connection.close()
 
-        # Obtener la imagen subida
         connection = get_db_connection()
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute('SELECT * FROM IMAGEN WHERE ID = %s', (image_id,))
@@ -180,7 +180,6 @@ def upload():
 
         connection.close()
 
-        # Formatear respuesta
         image_data = {
             'id': image['ID'],
             'nombre': image['NOMBRE'],
@@ -195,7 +194,6 @@ def upload():
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({'error': str(e), 'message': 'Error en el servidor'}), 500
-
 
 @images_bp.route('/eliminar', methods=['DELETE'])
 def delete_image():
@@ -238,7 +236,7 @@ def delete_image():
 
 
 @images_bp.route('/analyzeImage', methods=['POST'])
-def analyze_image():
+def analyze_imageT():
     try:
         data = request.get_json()
         imagen = data.get('imagen')

@@ -17,6 +17,7 @@ import { AppSamplePageComponent } from './sample-page/sample-page.component';
 import { DialogComponentComponent } from './dialog-component/dialog-component.component';
 import { ImageComponent} from "./image/image.component";
 import { NewAlbumComponent} from "./new-album/new-album.component";
+import { EditAlbumComponent } from './edit-album/edit-album.component';
 
 @NgModule({
   imports: [
@@ -36,7 +37,8 @@ import { NewAlbumComponent} from "./new-album/new-album.component";
     AppSamplePageComponent,
     DialogComponentComponent,
     ImageComponent,
-    NewAlbumComponent
+    NewAlbumComponent,
+    EditAlbumComponent,
   ],
 })
 export class ExtraModule {}

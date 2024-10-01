@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 export class ImagesService {
 
   showPostOverlay = new BehaviorSubject(false);
-  private apiURL = 'http://127.0.0.1:3001/imagenes/'
+  private apiURL = 'http://192.168.0.20:5000/imagenes/'
 
   constructor(
     protected http: HttpClient,

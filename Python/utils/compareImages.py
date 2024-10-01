@@ -4,6 +4,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Verificar variables de entorno
+print("AWS_REGION:", os.getenv('AWS_REGION'))
+print("REKOGNITION_REGION:", os.getenv('REKOGNITION_REGION'))
+print("AWS_ACCESS_KEY_ID:", os.getenv('AWS_ACCESS_KEY_ID'))  # Para verificar
+print("AWS_SECRET_ACCESS_KEY:", os.getenv('AWS_SECRET_ACCESS_KEY'))  # Para verificar
+
+
 rekognition = boto3.client('rekognition',
     aws_access_key_id=os.getenv('REKOGNITION_ACCESS_KEY_ID'),
     aws_secret_access_key=os.getenv('REKOGNITION_SECRET_ACCESS_KEY'),
@@ -15,6 +22,8 @@ def compare_images(image_url, image_url2):
         image_name = image_url.split('/').pop()
         image_name2 = image_url2.split('/').pop()
 
+        print(rekognition.list_collections())
+        
         params = {
             'SimilarityThreshold': 80,
             'SourceImage': {

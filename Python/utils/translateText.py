@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 translate = boto3.client('translate',
-    aws_access_key_id=os.getenv('TRANSLATE_ACCESS_KEY_ID'),
-    aws_secret_access_key=os.getenv('TRANSLATE_SECRET_ACCESS_KEY'),
-    region_name=os.getenv('TRANSLATE_REGION')
+    aws_access_key_id=os.getenv('TRASLATE_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv('TRASLATE_SECRET_ACCESS_KEY'),
+    region_name=os.getenv('TRASLATE_REGION')
 )
 
 def translate_text(text, target_language):

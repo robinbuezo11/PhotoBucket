@@ -46,24 +46,27 @@ def get_albums():
 def get_user_albums(userId):
     try:
         connection = get_db_connection()
-        with connection.cursor(pymysql.cursor.DictCursor) as cursor:
-            cursor.execute('SELECT * FROM ALBUM WHERE USUARIO = %s', (userId,))
-            rows = cursor.fetchall()
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        cursor.execute('SELECT * FROM ALBUM WHERE USUARIO = %s', (userId,))
+        rows = cursor.fetchall()
 
-            albums = [
-                {
-                    'id':           album['ID'],
-                    'nombre':       album['NOMBRE'],
-                    'usuario':      album['USUARIO'],
-                    'creacion':     album['CREACION']
-                }
-                for album in rows
-            ]
+        albums = [
+            {
+                'id':           album['ID'],
+                'nombre':       album['NOMBRE'],
+                'usuario':      album['USUARIO'],
+                'creacion':     album['CREACION']
+            }
+            for album in rows
+        ]
+        
+        cursor.close()
         connection.close()
         return jsonify(albums)
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({'error': str(e), 'message': 'Error al obtener los álbumes'}), 500
+
 
 # Create album
 @albums_bp.route('/crear', methods=['POST'])
