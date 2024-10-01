@@ -55,6 +55,7 @@ export class AppDashboardComponent implements OnInit{
   currentIndex = 0;
   itemsPerPage = 4;
   animate = false;
+  selectedAlbum: any = null;
 
   ngOnInit(): void {
     this.user = JSON.parse(sessionStorage.getItem('userData') || '{}');
@@ -197,22 +198,60 @@ export class AppDashboardComponent implements OnInit{
       width: '500px',
       data: {
         title: 'Edit Album',
-        album: album,  // Enviando los datos del álbum
+        album: album,
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined) {
         console.log('Result from dialog:', result);
-        this.albumService.updateAlbum(result).subscribe((response) => {
-          this.albums = this.albums.map((album: any) => {
-            if (album.id === result.id) {
-              return result;
-            }
-            return album;
-          });
+        this.albumService.updateAlbum(result).subscribe({
+          next: (response) => {
+            this.albums = this.albums.map((existingAlbum: any) => {
+              if (existingAlbum.id === result.id) {
+                return result;
+              }
+              return existingAlbum;
+            });
+            this.albumService.getAlbumsByUser(this.user.id).subscribe((response) => {
+              console.log(response);
+              this.albums = response;
+            });
+            this._snackBar.open('Álbum actualizado exitosamente', 'Cerrar', {
+              duration: 3000,
+            });
+          },
+          error: (err) => {
+            this._snackBar.open('Error al actualizar el álbum', 'Cerrar', {
+              duration: 3000,
+            });
+            console.error('Error al actualizar el álbum:', err);
+          }
         });
       }
     });
+  }
+
+  filterByAlbum(album: any){
+    if (this.selectedAlbum && this.selectedAlbum.id === album.id) {
+      this.selectedAlbum = null;
+      this.imageService.getImagesByUser(this.user.id).subscribe((response) => {
+        this.imagenes = response;
+      });
+    } else {
+      this.selectedAlbum = album;
+      console.log('Selected album:', album);
+
+      if(album.nombre){
+
+      }else{
+        this.imageService.getImagesByUser(this.user.id).subscribe((response) => {
+          if(response.length > 0){
+            response = response.filter((image: any) => image.album === album.id);
+          }
+          this.imagenes = response;
+        });
+      }
+    }
   }
 }

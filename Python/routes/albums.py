@@ -131,9 +131,13 @@ def delete_album():
         # Conectar a la base de datos
         connection = get_db_connection()
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            # Obtener imágenes del álbum antes de eliminar
+            # Obtener imágenes del álbum antes de eliminarlas
             cursor.execute('SELECT IMAGEN FROM IMAGEN WHERE ALBUM = %s', (album,))
             images = cursor.fetchall()
+
+            # Eliminar las imágenes de la base de datos primero
+            cursor.execute('DELETE FROM IMAGEN WHERE ALBUM = %s', (album,))
+            connection.commit()
 
             # Eliminar el álbum de la base de datos
             cursor.execute('DELETE FROM ALBUM WHERE USUARIO = %s AND ID = %s', (usuario, album))

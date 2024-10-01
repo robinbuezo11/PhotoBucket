@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 export class ImagesService {
 
   showPostOverlay = new BehaviorSubject(false);
-  private apiURL = 'http://192.168.0.20:5000/imagenes/'
+  private apiURL = 'http://192.168.1.135:5000/imagenes/'
 
   constructor(
     protected http: HttpClient,
@@ -39,6 +39,7 @@ export class ImagesService {
   }
 
   showTextAnalysis(image: any): Observable<any> {
+    console.log(image)
     return this.http.post<any>(this.apiURL + 'analyzeImage', image);
   }
 
@@ -52,5 +53,9 @@ export class ImagesService {
 
   updateImage(image: any): Observable<any> {
     return this.http.put(this.apiURL + 'actualizar', image);
+  }
+
+  imagenesPerfil(usuarioId: string): Observable<any> {
+    return this.http.get<any[]>(this.apiURL + 'perfil-images/' + usuarioId);
   }
 }

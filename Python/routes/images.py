@@ -52,7 +52,43 @@ def get_images():
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({'error': str(e), 'message': 'Error al obtener las imágenes'}), 500
-    
+
+@images_bp.route('/perfil-images', methods=['GET'])
+def get_perfil_images():
+    try:
+        # Obtener el parámetro de nombre de la solicitud
+        nombre = request.args.get('nombre')
+        if not nombre:
+            return jsonify({'error': 'El parámetro "nombre" es obligatorio.'}), 400
+
+        # Listar los objetos en la carpeta Fotos_Perfil del bucket
+        response = s3_client.list_objects_v2(
+            Bucket=os.getenv('AWS_BUCKET_NAME'),
+            Prefix='Fotos_Perfil/'
+        )
+
+        # Verificar si hay resultados en la carpeta
+        if 'Contents' not in response:
+            return jsonify({'error': 'No se encontraron imágenes en la carpeta Fotos_Perfil.'}), 404
+
+        # Filtrar las imágenes que contienen el nombre proporcionado en el parámetro
+        filtered_images = []
+        for obj in response['Contents']:
+            if nombre in obj['Key']:
+                # Crear la URL de acceso público a la imagen
+                image_url = f"https://{os.getenv('AWS_BUCKET_NAME')}.s3.amazonaws.com/{obj['Key']}"
+                filtered_images.append(image_url)
+
+        # Verificar si hay imágenes filtradas
+        if not filtered_images:
+            return jsonify({'message': f'No se encontraron imágenes con el nombre "{nombre}" en Fotos_Perfil.'}), 404
+
+        # Retornar las imágenes filtradas
+        return jsonify({'images': filtered_images})
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({'error': str(e), 'message': 'Error al obtener las imágenes del bucket'}), 500
 
 @images_bp.route('/<int:usuarioId>', methods=['GET'])
 def get_images_by_usuario(usuarioId):
@@ -243,9 +279,7 @@ def analyze_imageT():
 
         if not imagen:
             return jsonify({'message': 'Imagen no proporcionada'}), 400
-        
-        image_data = base64.b64decode(imagen.replace('data:image/png;base64,', ''))
-
+        image_data = re.sub(r'^data:image/\w+;base64,', '', imagen)
         if not image_data:
             return jsonify({'message': 'Error al procesar la imagen'}), 400
         
@@ -259,11 +293,11 @@ def analyze_imageT():
     
 
 @images_bp.route('/translateText', methods=['POST'])
-def translate_text():
+def translate_textR():
     try:
         data = request.get_json()
         text = data.get('text')
-        target_lang = data.get('targetLang')
+        target_lang = data.get('targetLanguage')
 
         if not text or not target_lang:
             return jsonify({'message': 'Faltan campos obligatorios'}), 400

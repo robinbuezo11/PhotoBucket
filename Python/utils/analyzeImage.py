@@ -8,7 +8,7 @@ load_dotenv()
 rekognition = boto3.client('rekognition',
     aws_access_key_id=os.getenv('REKOGNITION_ACCESS_KEY_ID'),
     aws_secret_access_key=os.getenv('REKOGNITION_SECRET_ACCESS_KEY'),
-    region_name=os.getenv('REKOGNITION_REGION_NAME')
+    region_name=os.getenv('REKOGNITION_REGION')
 )
 
 def analyze_image(base64_image):

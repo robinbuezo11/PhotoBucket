@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 })
 export class AlbumsService {
 
-  private apiURL = 'http://192.168.0.20:5000/albumes/'
+  private apiURL = 'http://192.168.1.135:5000/albumes/'
 
   constructor(
     protected http: HttpClient,
@@ -33,6 +33,6 @@ export class AlbumsService {
   }
 
   updateAlbum(album: any): Observable<any> {
-    return this.http.put(this.apiURL + 'actualizar', album);
+    return this.http.post(this.apiURL + 'actualizar', album);
   }
 }

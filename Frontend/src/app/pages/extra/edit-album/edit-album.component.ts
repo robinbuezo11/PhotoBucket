@@ -40,14 +40,11 @@ export class EditAlbumComponent {
     if (this.form.invalid) {
       return;
     }
-
     const albumData = {
-      id: this.data.album.id, 
-      nombreAlbum: this.form.value.albumName,
+      album: this.data.album,
+      nombre: this.form.value.albumName,
       usuario: this.user.id
     };
-    console.log(albumData);
-
     this.dialogRef.close(albumData);
   }
 }

@@ -25,13 +25,11 @@
           </div>
           <div class="row text-center pt-4">
             <label>
-                            <span class="button">
-                                <input type="file" class="button"
-                                       (change)="manageFiles($event)" multiple>
-                            </span>
+              <span class="button">
+                <input type="file" class="button" (change)="manageFiles($event)" multiple>
+              </span>
             </label>
           </div>
-
         </div>
         <div class="col-6">
           <form [formGroup]="form" (ngSubmit)="submit()" class="m-t-30">
@@ -49,8 +47,8 @@
             <mat-form-field appearance="outline" class="w-100" color="primary">
               <mat-label>Seleccione album de destino</mat-label>
               <mat-select formControlName="album">
-                @for (a of albumes; track a) {
-                  <mat-option [value]="a.value">{{a.viewValue}}</mat-option>
+                @for (a of albums; track a) {
+                  <mat-option [value]="a.id">{{a.nombre}}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -59,7 +57,7 @@
               Cargar Imagen
             </button>
 
-            <button mat-flat-button color="primary" type="submit" class="w-100 mt-3 bg-error"
+            <button mat-flat-button color="primary" type="submit" class="w-100 mt-3 bg-error" [routerLink]="['/dashboard']"
             >
               Cancelar
             </button>

@@ -314,12 +314,7 @@ router.post('/loginCamera', async (req, res) => {
         let similitudReconocida = null;
 
         for (const user of userRows) {
-            console.log('images compared; ', capturedImageUrl,  user.RECIMAGEN);
             const result = await compareImages(capturedImageUrl, user.RECIMAGEN);
-
-            console.log('result', result);
-
-            // Verificar que 'result' sea un array y que contenga FaceMatches con Similarity mayor a 80
             if (result.length > 0 && result[0].Similarity > 80) {
                 const similarity = result[0].Similarity;
                 usuarioReconocido = user.ID;
@@ -354,7 +349,6 @@ router.post('/loginCamera', async (req, res) => {
         return res.status(500).json({ message: 'Error en el reconocimiento facial', error: error.message });
     }
 });
-
 
 async function uploadImageToS3(base64Image, userId) {
     const recimageBuffer = Buffer.from(base64Image.replace(/^data:image\/\w+;base64,/, ''), 'base64');

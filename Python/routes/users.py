@@ -365,11 +365,10 @@ def login_camera():
             
             for user in user_rows:
                 result = compare_images(captured_image_url, user['RECIMAGEN'])
-                if result and isinstance(result, list) and len(result) > 0 and result[0]['Similarity' > 80]:
+                if result and isinstance(result, list) and len(result) > 0 and result[0]['Similarity'] > 80:
                     usuario_reconocido = user['ID']
                     similitud_reconocida = result[0]['Similarity']
                     break
-                
             if usuario_reconocido:
                 cursor.execute('SELECT * FROM USUARIO WHERE ID = %s', (usuario_reconocido,))
                 user_data = cursor.fetchone()
@@ -387,6 +386,7 @@ def login_camera():
     except Exception as e:
         print('Error en el reconocimiento facial:', e)
         return jsonify({'message': 'Error en el reconocimiento facial', 'error': str(e)}), 500
+
     
 # upload image to s3
 def upload_image_to_s3(base64_image, user_id):
