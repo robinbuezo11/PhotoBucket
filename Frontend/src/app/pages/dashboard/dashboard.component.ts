@@ -242,8 +242,16 @@ export class AppDashboardComponent implements OnInit{
       this.selectedAlbum = album;
       console.log('Selected album:', album);
 
-      if(album.nombre){
-
+      if(album.nombre ==='Perfil'){
+        const data = {
+          nombre : this.user.usuario,
+        }
+        this.imageService.imagenesPerfil(this.user.usuario).subscribe((response) => {
+          if(response.length > 0){
+            response = response.filter((image: any) => image.album === album.id);
+          }
+          this.imagenes = response;
+        });
       }else{
         this.imageService.getImagesByUser(this.user.id).subscribe((response) => {
           if(response.length > 0){
